@@ -41,6 +41,13 @@ gr_width    = $fe
 gr_height   = $ff
 gr_LastYPos = $eb
 
+* TODO: move these
+ff_color    =  $08
+ff_xpos     =  $08
+ff_ypos     =  $08
+ff_stack    =  $ff
+ff_dir      =  $fd
+
 * I/O reuses the gr_ interface
 io_src_addr_hi = $f9
 io_src_count_hi = $fa
@@ -54,7 +61,7 @@ joy_y       = $07
 tmp0        = $08
 tmp1        = $09
 
-* Available ZP locations: $ec-$ef
+* Available ZP locations: $ec - $ef
 
 * ProDOS entry point
 MLI           equ $bf00

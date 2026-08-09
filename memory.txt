@@ -18,5 +18,12 @@ PAINTER.SYSTEM
 6100-xxxx - game code
 
 
+vtab
+         lda   HS_VTAB,y  ;4+
+         sta   MON_CV     ;3
+         jsr   MON_VTAB   ;6
+htab
+         lda   L6262,y    ;4+
+         sta   MON_CH     ;3
 
-
+MON_COUT - one char

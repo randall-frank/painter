@@ -4,13 +4,17 @@
          
          put   COMMON.S         
 
-FLG_NO_FILL equ 1
-FLG_COLLIDE equ 2
+FLG_NO_FILL     equ 1
+FLG_COLLIDE     equ 2
 FLG_NO_GREMLINS equ $80
-KEY_RETURN equ $8d
-KEY_CTRL_S equ $93
-KEY_ESC  equ   $9b
-KEY_SPACE equ  $a0
+
+KEY_RETURN      equ $8d
+KEY_CTRL_S      equ $93
+KEY_ESC         equ $9b
+KEY_SPACE       equ $a0
+
+FF_STACK_SIZE   equ $d8   
+
 
 TMP0     equ   $00
 TMP1     equ   $01
@@ -26,7 +30,10 @@ HGR_PAGE equ   $e6
 HT2_INIT equ   $07fd
 
          org   $6000
-      
+
+* 8 bytes/highscore, 10 highscores
+* 3 bytes score (two nibble digits/byte), 3 bytes Initials
+
 HIGHSCORES
          hex   0000000000000000000000000000000000000000000000000000000000000000
          hex   0000000000000000000000000000000000000000000000000000000000000000
@@ -141,19 +148,24 @@ STILL_MOVING
          lda   HS_VTAB,y  ;4+
          sta   MON_CV     ;3
          jsr   MON_VTAB   ;6
-         lda   L6262,y    ;4+
+         lda   HS_HTAB,y  ;4+
          clc              ;2
          adc   #$07       ;2
          sta   L6256      ;4
          lda   #$00       ;2
          sta   HS_NUMBER  ;4
+
+* Prompt for 3 initials
+
 :L61BC   lda   HS_NUMBER  ;4
          clc              ;2
          adc   L6256      ;4
          sta   MON_CH     ;3
-:L61C5   bit   KBD        ;4
-         bpl   :L61C5     ;2+
-         lda   KBD        ;4  Enter initials???
+:key_loop 
+         bit   KBD        ;4
+         bpl   :key_loop     ;2+
+         lda   KBD        ;4  Enter initials
+
          bit   KBDSTRB    ;4
          cmp   #KEY_RETURN ;2
          beq   :L61F1     ;2+
@@ -190,7 +202,7 @@ DISP_1_HISCORE
          lda   HS_VTAB,y  ;4+
          sta   MON_CV     ;3
          jsr   MON_VTAB   ;6
-         lda   L6262,y    ;4+
+         lda   HS_HTAB,y  ;4+
          sta   MON_CH     ;3
          lda   #>HIGHSCORES ;2  Highscore table is at $6000
          sta   TMP1       ;3
@@ -241,7 +253,7 @@ HS_VTAB  dfb   $00
          dfb   $11
          dfb   $13
          dfb   $15
-L6262    dfb   $00
+HS_HTAB  dfb   $00
          ds    5,$06
          ds    5,$18
 
@@ -292,9 +304,9 @@ COPY_HGR2
          rts              ;6
 
 DITHERNAME
-         lda   #$70       ;2  pixels at $7000 - Need call to $F3E2 (HGR) first
+         lda   #>TITLE_PIXELS  ;2  pixels at $7000 - Need call to $F3E2 (HGR) first
          sta   TMP1       ;3
-         lda   #$00       ;2
+         lda   #<TITLE_PIXELS       ;2
          sta   TMP0       ;3
          lda   #$92       ;2
          jsr   MON_COUT   ;6
@@ -3188,6 +3200,9 @@ NOISE    ldy   #$ff       ;2
          dfb   $18
          dfb   $c4
          dfb   $18
+         DS \
+
+TITLE_PIXELS         
          dfb   $2e
          dfb   $08
          dfb   $30
@@ -6501,29 +6516,12 @@ NOISE    ldy   #$ff       ;2
          asc   '"";A$:L'
 
 GAME_SETUP
+         jsr   HGR_CLEAR  ;6
+         lda   MIXCLR     ;4
          jmp   TITLEPAGE  ;3
-         lda   #$fd       ;2
-         sta   TMP0       ;3  Relocate higher text 2 from 2100 to 07FD
-         lda   #$07       ;2
-         sta   TMP1       ;3
-         lda   #$00       ;2
-         sta   CROSS_X    ;3
-         lda   #$21       ;2
-         sta   CROSS_Y    ;3
-:L7F10   ldy   #$00       ;2
-:L7F12   dey              ;2
-         lda   (CROSS_X),y ;5+
-         sta   (TMP0),y   ;6
-         cpy   #$00       ;2
-         bne   :L7F12     ;2+
-         inc   TMP1       ;5
-         inc   CROSS_Y    ;5
-         lda   TMP1       ;3
-         cmp   #$20       ;2
-         bne   :L7F10     ;2+
-         jsr   HT2_INIT   ;6
 
-KEYCHECK lda   KBD        ;4
+KEYCHECK 
+         lda   KBD        ;4
          cmp   #KEY_CTRL_S ;2
          bne   :L7F3D     ;2+
          lda   INLINE_CLICK+1 ;4
@@ -7902,6 +7900,7 @@ TXT_OUTOFFILL
          dfb   $0c
          dfb   $d4
          dfb   $d2
+         ds    \
 SOUND_TABLE
          hex   6464646464016464
          hex   6464640164646464
@@ -7999,6 +7998,7 @@ SOUND_TABLE
          hex   3741414141414141
          hex   4b4b4b4b4b4b4b4b
          hex   4b4b4b4b4b4b4b4b
+         DS    \
 GREMLIN_MASKS
          hex   4601002800007c00
          hex   007f03007f03007f
@@ -8032,6 +8032,7 @@ GREMLIN_MASKS
          hex   0000080400040800
          hex   6211005212005e1e
          hex   0072130062110004
+         DS    \
 GREMLIN_IMAGES
          hex   4601002800005400001102005502007d02005502005400004400004502000408
          hex   0c03005000002801002204002a05007a05002a05002801000801000a05000040
@@ -8041,6 +8042,7 @@ GREMLIN_IMAGES
          hex   403100000a00001500204400205500205f002055000015000011002051007000
          hex   006300001400002a00400801402a01403e01402a01002a000022004022010210
          hex   000000000000000000000804000408006211005212005e1e0072130062110004
+         DS    \
 CROSS_IMAGES
          hex   4800004800004800004f07000000004f07004800004800004800000000000000
          hex   1001001001001001001e0f000000001e0f001001001001001001000000000000
@@ -8051,6 +8053,8 @@ CROSS_IMAGES
          hex   0024000024000024004067030000004067030024000024000024000000000000
          hex   552a55552a55552a55552a55552a5555ffff0000ffff0000ffff0000ffff0000
 
+
+* X = $06, Y = $07, color = $08
 FLOODFILL
          ldx:  $0008      ;4
          jsr   SETHCOLOR  ;6
@@ -8070,14 +8074,15 @@ FLOODFILL
          sta:  $00ff      ;4
          jsr   :L904D     ;6
 :L902A   lda:  $00fd      ;4
-         bne   :L9030     ;2+
+         bne   FF_POPSTACK     ;2+
          rts              ;6
 
-:L9030   dec:  $00fd      ;6
+FF_POPSTACK
+         dec:  $00fd      ;6
          ldy:  $00fd      ;4
-         lda   L9450,y    ;4+
+         lda   FF_STACK_X,y    ;4+
          sta:  $0006      ;4
-         lda   L9528,y    ;4+
+         lda   FF_STACK_Y,y    ;4+
          sta:  $0007      ;4
          lda   #$02       ;2
          sta:  $00ff      ;4
@@ -8114,7 +8119,7 @@ FLOODFILL
          sta:  $00fe      ;4
 :L908E   jsr   L9150      ;6
          lda   L9320      ;4
-         beq   :L90A4     ;2+
+         beq   FF_MOVE_POINT    ;2+
          inc:  $00fe      ;6
          lda:  $00fe      ;4
          cmp   #$05       ;2
@@ -8123,14 +8128,15 @@ FLOODFILL
 
 :L90A1   jmp   :L908E     ;3
 
-:L90A4   ldy:  $00fe      ;4
+FF_MOVE_POINT
+         ldy:  $00fe      ;4
          lda:  $0006      ;4
          clc              ;2
-         adc   L9312,y    ;4+
+         adc   FF_XDIR_TAB,y    ;4+
          sta:  $0006      ;4
          lda:  $0007      ;4
          clc              ;2
-         adc   L931B,y    ;4+
+         adc   FF_YDIR_TAB,y    ;4+
          sta:  $0007      ;4
          jsr   :L90F0     ;6
          jmp   :L9050     ;3
@@ -8143,11 +8149,11 @@ FLOODFILL
          ldy:  $00ff      ;4
          lda:  $0006      ;4
          clc              ;2
-         adc   L930E,y    ;4+
+         adc   FF_XDIR_ADD,y    ;4+
          sta:  $0006      ;4
          lda:  $0007      ;4
          clc              ;2
-         adc   L9317,y    ;4+
+         adc   FF_YDIR_ADD,y    ;4+
          sta:  $0007      ;4
          jsr   :L90F0     ;6
          jsr   L91A8      ;6
@@ -8217,11 +8223,11 @@ L9150    lda:  $00ff      ;4
 L9166    lda   #$00       ;2
          sta   CROSS_INDEX ;4
          ldy:  $00ff      ;4
-         lda   L930E,y    ;4+
+         lda   FF_XDIR_ADD,y    ;4+
          clc              ;2
          adc:  $0006      ;4
          pha              ;3
-         lda   L9317,y    ;4+
+         lda   FF_YDIR_ADD,y    ;4+
          clc              ;2
          adc:  $0007      ;4
          jsr   CALC_GR_SCANLINE ;6
@@ -8326,9 +8332,9 @@ L91A8    jsr   L9166      ;6
          beq   :L9275     ;2+
          lda   L9324      ;4
          ldy:  $00fd      ;4
-         sta   L9450,y    ;5
+         sta   FF_STACK_X,y    ;5
          lda   L9323      ;4
-         sta   L9528,y    ;5
+         sta   FF_STACK_Y,y    ;5
          inc:  $00fd      ;6
 :L9275   lda   L9329      ;4
          sta:  $00ff      ;4
@@ -8405,20 +8411,24 @@ L9300    dfb   $03
          dfb   $40
 L9307    ds    6
          dfb   $01
-L930E    dfb   $00
+FF_XDIR_ADD    
+         dfb   $00
          dfb   $00
          dfb   $ff
          dfb   $00
-L9312    dfb   $01
+FF_XDIR_TAB
+         dfb   $01
          dfb   $01
          dfb   $ff
          dfb   $ff
          dfb   $01
-L9317    dfb   $00
+FF_YDIR_ADD
+         dfb   $00
          dfb   $ff
          dfb   $00
          dfb   $01
-L931B    dfb   $00
+FF_YDIR_TAB
+         dfb   $00
          dfb   $ff
          dfb   $ff
          dfb   $01
@@ -8440,6 +8450,7 @@ L932C    dfb   $00
 L932D    dfb   $00
 L932E    dfb   $00
          dfb   $20
+
 DIV7_BIT_TABLE
          hex   0002040601030500
          hex   0204060103050002
@@ -8459,6 +8470,7 @@ DIV7_BIT_TABLE
          hex   0204060103050002
          hex   0406010305000204
          hex   06010305
+
 DIV7_BYTE_TABLE
          hex   0000000001010102
          hex   0202020303030404
@@ -8486,357 +8498,10 @@ DIV7_BYTE_TABLE
          dfb   $ff
          dfb   $00
          dfb   $00
-L9450    dfb   $ff
-         dfb   $ff
-         dfb   $00
-         dfb   $00
-         dfb   $ff
-         dfb   $ff
-         dfb   $00
-         dfb   $00
-         dfb   $ff
-         dfb   $ff
-         dfb   $00
-         dfb   $00
-         dfb   $10
-         asc   "{I*P$"
-         dfb   $18
-         dfb   $60
-         dfb   $a2
-         dfb   $32
-         dfb   $a0
-         dfb   $00
-         dfb   $bd
-         dfb   $00
-         dfb   $bc
-         dfb   $4a
-         dfb   $4a
-         dfb   $4a
-         dfb   $85
-         dfb   $27
-         dfb   $4a
-         dfb   $85
-         dfb   $26
-         dfb   $4a
-         dfb   $1d
-         dfb   $00
-         dfb   $bb
-         dfb   $91
-         dfb   $3e
-         dfb   $c8
-         dfb   $bd
-         dfb   $33
-         dfb   $bc
-         asc   'JJJJ&',27,'J&&'
-         dfb   $1d
-         dfb   $33
-         dfb   $bb
-         dfb   $91
-         dfb   $3e
-         dfb   $c8
-         dfb   $bd
-         dfb   $66
-         dfb   $bc
-         asc   'JJJJ&',27,'J&&'
-         dfb   $1d
-         dfb   $66
-         dfb   $bb
-         dfb   $91
-         dfb   $3e
-         dfb   $c8
-         dfb   $a5
-         dfb   $26
-         dfb   $29
-         dfb   $07
-         dfb   $1d
-         dfb   $99
-         dfb   $bb
-         dfb   $91
-         dfb   $3e
-         dfb   $c8
-         dfb   $a5
-         dfb   $27
-         dfb   $29
-         dfb   $07
-         dfb   $1d
-         dfb   $cc
-         dfb   $bb
-         dfb   $91
-         dfb   $3e
-         dfb   $c8
-         dfb   $ca
-         dfb   $10
-         dfb   $b3
-         dfb   $ad
-         dfb   $99
-         dfb   $bc
-         asc   'JJJ',0d
-         dfb   $ff
-         dfb   $bb
-         dfb   $91
-         dfb   $3e
-         dfb   $60
-         dfb   $86
-         dfb   $2b
-         dfb   $85
-         dfb   $2a
-         dfb   $cd
-         dfb   $78
-         dfb   $04
-         dfb   $f0
-         dfb   $53
-         dfb   $a9
-         dfb   $00
-         dfb   $85
-         dfb   $26
-         dfb   $ad
-         dfb   $78
-         dfb   $04
-         dfb   $85
-         dfb   $27
-         dfb   $38
-         dfb   $e5
-         dfb   $2a
-         dfb   $f0
-         dfb   $33
-         dfb   $b0
-         dfb   $07
-         dfb   $49
-         dfb   $ff
-         dfb   $ee
-         dfb   $78
-         dfb   $04
-         dfb   $90
-         dfb   $05
-         dfb   $69
-         dfb   $fe
-         dfb   $ce
-         dfb   $78
-         dfb   $04
-         dfb   $c5
-         dfb   $26
-         dfb   $90
-         dfb   $02
-         dfb   $a5
-         dfb   $26
-         dfb   $c9
-         dfb   $0c
-         dfb   $b0
-         dfb   $01
-         dfb   $a8
-         dfb   $38
-         dfb   $20
-         dfb   $6c
-         dfb   $ba
-         dfb   $b9
-         dfb   $8c
-         dfb   $ba
-         dfb   $20
-         dfb   $7b
-         dfb   $ba
-         dfb   $a5
-         dfb   $27
-         dfb   $18
-         dfb   $20
-         dfb   $6f
-         dfb   $ba
-         dfb   $b9
-         dfb   $98
-         dfb   $ba
-         dfb   $20
-         dfb   $7b
-         dfb   $ba
-         dfb   $e6
-         dfb   $26
-         dfb   $d0
-         dfb   $c3
-         dfb   $20
-         dfb   $7b
-         dfb   $ba
-         dfb   $18
-         dfb   $ad
-         dfb   $78
-         dfb   $04
-         dfb   $29
-         dfb   $03
-         dfb   $2a
-         dfb   $05
-         dfb   $2b
-         dfb   $aa
-         dfb   $bd
-         dfb   $80
-         dfb   $c0
-         dfb   $a6
-         dfb   $2b
-         dfb   $60
-         dfb   $a2
-         dfb   $11
-         asc   "JP}f"
-         dfb   $46
-         dfb   $d0
-         dfb   $02
-         dfb   $e6
-L9528    dfb   $47
-         dfb   $38
-         dfb   $e9
-         dfb   $01
-         dfb   $d0
-         dfb   $f0
-         dfb   $60
-         dfb   $01
-         asc   '0($ '
-         dfb   $1e
-         dfb   $1d
-         ds    5,$1c
-         asc   'p,&"'
-         dfb   $1f
-         dfb   $1e
-         dfb   $1d
-         ds    9,$1c
-         dfb   $00
-         dfb   $00
-         dfb   $00
-         dfb   $00
-         dfb   $01
-         dfb   $08
-         dfb   $10
-         dfb   $18
-         dfb   $02
-         dfb   $03
-         dfb   $04
-         dfb   $05
-         dfb   $06
-         asc   ' (0',07
-         dfb   $09
-         asc   '8@',0a,'HPX'
-         dfb   $0b
-         dfb   $0c
-         dfb   $0d
-         dfb   $0e
-         dfb   $0f
-         dfb   $11
-         dfb   $12
-         dfb   $13
-         dfb   $14
-         dfb   $15
-         dfb   $16
-         dfb   $17
-         dfb   $19
-         dfb   $1a
-         dfb   $1b
-         dfb   $1c
-         dfb   $1d
-         dfb   $1e
-         asc   '!"#$`h%&px',27
-         dfb   $80
-         dfb   $88
-         dfb   $90
-         asc   ')*+,-./123'
-         dfb   $98
-         dfb   $a0
-         dfb   $34
-         dfb   $a8
-         dfb   $b0
-         dfb   $b8
-         asc   '5679:'
-         dfb   $c0
-         dfb   $c8
-         dfb   $d0
-         dfb   $3b
-         dfb   $3c
-         dfb   $d8
-         dfb   $e0
-         dfb   $3e
-         dfb   $e8
-         dfb   $f0
-         dfb   $f8
-         dfb   $18
-         dfb   $f8
-         dfb   $f8
-         asc   ' H@8'
-         dfb   $10
-         dfb   $90
-         dfb   $90
-         dfb   $b0
-         dfb   $88
-         dfb   $88
-         dfb   $08
-         dfb   $a8
-         dfb   $20
-         dfb   $a0
-         dfb   $08
-         dfb   $00
-         dfb   $c8
-         dfb   $08
-         dfb   $48
-         dfb   $f0
-         dfb   $b0
-         dfb   $88
-         dfb   $c0
-         dfb   $e8
-         dfb   $b8
-         dfb   $38
-         dfb   $b0
-         dfb   $28
-         dfb   $08
-         dfb   $20
-         dfb   $10
-         dfb   $90
-         dfb   $48
-         dfb   $a0
-         dfb   $88
-         dfb   $88
-         dfb   $88
-         dfb   $20
-         dfb   $00
-         dfb   $08
-         dfb   $00
-         dfb   $08
-         dfb   $20
-         dfb   $c8
-         dfb   $d0
-         dfb   $f8
-         dfb   $80
-         dfb   $20
-         dfb   $20
-         dfb   $10
-         dfb   $20
-         dfb   $d8
-         dfb   $58
-         dfb   $48
-         dfb   $60
-         dfb   $18
-         dfb   $b0
-         dfb   $e0
-         dfb   $88
-         dfb   $10
-         dfb   $18
-         dfb   $20
-         dfb   $e0
-         dfb   $a8
-         dfb   $10
-         dfb   $c8
-         dfb   $b0
-         dfb   $90
-         dfb   $48
-         dfb   $f0
-         dfb   $b0
-         dfb   $88
-         dfb   $30
-         dfb   $90
-         dfb   $e8
-         dfb   $b0
-         dfb   $78
-         dfb   $a0
-         dfb   $a8
-         dfb   $c8
-         dfb   $08
-         dfb   $a8
-         dfb   $b0
-         dfb   $10
-         dfb   $90
-         dfb   $08
-         dfb   $08
-         dfb   $58
-         dfb   $48
-         dfb   $08
+
+FF_STACK_X
+         ds    FF_STACK_SIZE    
+        
+FF_STACK_Y
+         ds    FF_STACK_SIZE 
+
