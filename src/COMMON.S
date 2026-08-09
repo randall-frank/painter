@@ -43,10 +43,11 @@ gr_LastYPos = $eb
 
 * TODO: move these
 ff_color    =  $08
-ff_xpos     =  $08
-ff_ypos     =  $08
-ff_stack    =  $ff
-ff_dir      =  $fd
+ff_xpos     =  $06
+ff_ypos     =  $07
+ff_dir2     =  $ff
+ff_dir1     =  $fe
+ff_stack    =  $fd
 
 * I/O reuses the gr_ interface
 io_src_addr_hi = $f9

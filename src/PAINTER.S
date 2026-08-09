@@ -6761,17 +6761,17 @@ L819A    lda   BUTN1      ;4
          asl   A          ;2
          bcc   L81F4      ;2+
          lda   CROSS_X    ;3
-         sta:  $0006      ;4
-         inc:  $0006      ;6
-         inc:  $0006      ;6
+         sta   ff_xpos      ;4
+         inc   ff_xpos      ;6
+         inc   ff_xpos      ;6
          lda   CROSS_Y    ;3
-         sta:  $0007      ;4
-         inc:  $0007      ;6
-         inc:  $0007      ;6
-         inc:  $0007      ;6
-         inc:  $0007      ;6
+         sta   ff_ypos      ;4
+         inc   ff_ypos      ;6
+         inc   ff_ypos      ;6
+         inc   ff_ypos      ;6
+         inc   ff_ypos      ;6
          lda   #$02       ;2
-         sta:  $0008      ;4
+         sta   ff_color      ;4
          jsr   FLOODFILL  ;6  Fill starting at 6,7 using color 8
          lda   TMP0       ;3
          cmp   FILL_LOW   ;4
@@ -8056,36 +8056,36 @@ CROSS_IMAGES
 
 * X = $06, Y = $07, color = $08
 FLOODFILL
-         ldx:  $0008      ;4
+         ldx   ff_color      ;4
          jsr   SETHCOLOR  ;6
          lda   #$00       ;2
          sta   TMP0       ;3
          sta   TMP1       ;3
-         sta:  $00fd      ;4
+         sta   ff_stack      ;4
          lda   #$01       ;2
-         sta:  $00ff      ;4
+         sta   ff_dir2      ;4
 :L9014   jsr   L9166      ;6
          lda   L9320      ;4
          bne   :L9022     ;2+
-         dec:  $0007      ;6
+         dec   ff_ypos      ;6
          jmp   :L9014     ;3
 
 :L9022   lda   #$02       ;2
-         sta:  $00ff      ;4
+         sta   ff_dir2      ;4
          jsr   :L904D     ;6
-:L902A   lda:  $00fd      ;4
+:L902A   lda   ff_stack      ;4
          bne   FF_POPSTACK     ;2+
          rts              ;6
 
 FF_POPSTACK
-         dec:  $00fd      ;6
-         ldy:  $00fd      ;4
+         dec   ff_stack      ;6
+         ldy   ff_stack      ;4
          lda   FF_STACK_X,y    ;4+
-         sta:  $0006      ;4
+         sta   ff_xpos      ;4
          lda   FF_STACK_Y,y    ;4+
-         sta:  $0007      ;4
+         sta   ff_ypos      ;4
          lda   #$02       ;2
-         sta:  $00ff      ;4
+         sta   ff_dir2      ;4
          jsr   :L9050     ;6
          jmp   :L902A     ;3
 
@@ -8096,32 +8096,32 @@ FF_POPSTACK
          beq   :L905B     ;2+
          rts              ;6
 
-:L905B   dec:  $00ff      ;6
+:L905B   dec   ff_dir2      ;6
          bne   :L9065     ;2+
          lda   #$04       ;2
-         sta:  $00ff      ;4
+         sta   ff_dir2      ;4
 :L9065   jsr   L9166      ;6
          lda   L9320      ;4
          bne   :L9070     ;2+
          jmp   :L90C1     ;3
 
-:L9070   inc:  $00ff      ;6
+:L9070   inc   ff_dir2      ;6
          inc   L9322      ;6
-         lda:  $00ff      ;4
+         lda   ff_dir2      ;4
          cmp   #$05       ;2
          bne   :L9082     ;2+
          lda   #$01       ;2
-         sta:  $00ff      ;4
+         sta   ff_dir2      ;4
 :L9082   lda   L9322      ;4
          cmp   #$05       ;2
          bne   :L9065     ;2+
          lda   #$01       ;2
-         sta:  $00fe      ;4
+         sta   ff_dir1      ;4
 :L908E   jsr   L9150      ;6
          lda   L9320      ;4
          beq   FF_MOVE_POINT    ;2+
-         inc:  $00fe      ;6
-         lda:  $00fe      ;4
+         inc   ff_dir1      ;6
+         lda   ff_dir1      ;4
          cmp   #$05       ;2
          bne   :L90A1     ;2+
          rts              ;6
@@ -8129,64 +8129,64 @@ FF_POPSTACK
 :L90A1   jmp   :L908E     ;3
 
 FF_MOVE_POINT
-         ldy:  $00fe      ;4
-         lda:  $0006      ;4
+         ldy   ff_dir1      ;4
+         lda   ff_xpos      ;4
          clc              ;2
          adc   FF_XDIR_TAB,y    ;4+
-         sta:  $0006      ;4
-         lda:  $0007      ;4
+         sta   ff_xpos      ;4
+         lda   ff_ypos      ;4
          clc              ;2
          adc   FF_YDIR_TAB,y    ;4+
-         sta:  $0007      ;4
+         sta   ff_ypos      ;4
          jsr   :L90F0     ;6
          jmp   :L9050     ;3
 
 :L90C1   jsr   :L90F0     ;6
-         lda:  $0006      ;4
+         lda   ff_xpos      ;4
          sta   L9324      ;4
-         lda:  $0007      ;4
+         lda   ff_ypos      ;4
          sta   L9323      ;4
-         ldy:  $00ff      ;4
-         lda:  $0006      ;4
+         ldy   ff_dir2      ;4
+         lda   ff_xpos      ;4
          clc              ;2
          adc   FF_XDIR_ADD,y    ;4+
-         sta:  $0006      ;4
-         lda:  $0007      ;4
+         sta   ff_xpos      ;4
+         lda   ff_ypos      ;4
          clc              ;2
          adc   FF_YDIR_ADD,y    ;4+
-         sta:  $0007      ;4
+         sta   ff_ypos      ;4
          jsr   :L90F0     ;6
          jsr   L91A8      ;6
          jmp   :L9050     ;3
 
 :L90F0   ldy   #$00       ;2
-         lda:  $00ff      ;4
+         lda   ff_dir2      ;4
          pha              ;3
          lda   #$00       ;2
-         sta:  $00ff      ;4
+         sta   ff_dir2      ;4
          jsr   L9166      ;6
          pla              ;4
-         sta:  $00ff      ;4
+         sta   ff_dir2      ;4
          lda   L9320      ;4
          bne   :L910A     ;2+
          jsr   :L9134     ;6
 :L910A   ldy   #$00       ;2
-         lda:  $0006      ;4
+         lda   ff_xpos      ;4
          asl   A          ;2
          bcc   :L9114     ;2+
          ldy   #$01       ;2
 :L9114   tax              ;2
-         lda:  $0007      ;4
+         lda   ff_ypos      ;4
          jsr   $f411      ;6
          jsr   $f45a      ;6
          ldy   #$00       ;2
-         lda:  $0006      ;4
+         lda   ff_xpos      ;4
          asl   A          ;2
          bcc   :L9128     ;2+
          ldy   #$01       ;2
 :L9128   tax              ;2
          inx              ;2
-         lda:  $0007      ;4
+         lda   ff_ypos      ;4
          jsr   $f411      ;6
          jsr   $f45a      ;6
          rts              ;6
@@ -8207,29 +8207,29 @@ FF_MOVE_POINT
          sta   FRAME_STATE ;4
 :L914F   rts              ;6
 
-L9150    lda:  $00ff      ;4
+L9150    lda   ff_dir2      ;4
          pha              ;3
-         ldy:  $00fe      ;4
+         ldy   ff_dir1      ;4
          iny              ;2
          iny              ;2
          iny              ;2
          iny              ;2
-         sty:  $00ff      ;4
+         sty   ff_dir2      ;4
          jsr   L9166      ;6
          pla              ;4
-         sta:  $00ff      ;4
+         sta   ff_dir2      ;4
          rts              ;6
 
 L9166    lda   #$00       ;2
          sta   CROSS_INDEX ;4
-         ldy:  $00ff      ;4
+         ldy   ff_dir2      ;4
          lda   FF_XDIR_ADD,y    ;4+
          clc              ;2
-         adc:  $0006      ;4
+         adc   ff_xpos      ;4
          pha              ;3
          lda   FF_YDIR_ADD,y    ;4+
          clc              ;2
-         adc:  $0007      ;4
+         adc   ff_ypos      ;4
          jsr   CALC_GR_SCANLINE ;6
          pla              ;4
          sta   X_POS      ;4
@@ -8254,7 +8254,7 @@ DIVIDE7  ldy   X_POS      ;4
 L91A8    jsr   L9166      ;6
          lda   L9320      ;4
          sta   L932A      ;4
-         lda:  $00ff      ;4
+         lda   ff_dir2      ;4
          sta   L9329      ;4
          tay              ;2
          dey              ;2
@@ -8268,26 +8268,26 @@ L91A8    jsr   L9166      ;6
          ldy   #$01       ;2
 :L91CA   sty   L932E      ;4
          lda   L932D      ;4
-         sta:  $00ff      ;4
+         sta   ff_dir2      ;4
          jsr   L9166      ;6
          lda   L9320      ;4
          sta   L932D      ;4
          lda   L932E      ;4
-         sta:  $00ff      ;4
+         sta   ff_dir2      ;4
          jsr   L9166      ;6
          lda   L9320      ;4
          sta   L932E      ;4
          lda   L9329      ;4
-         sta:  $00fe      ;4
+         sta   ff_dir1      ;4
          jsr   L9150      ;6
          lda   L9320      ;4
          sta   L932B      ;4
-         ldy:  $00fe      ;4
+         ldy   ff_dir1      ;4
          iny              ;2
          cpy   #$05       ;2
          bne   :L9204     ;2+
          ldy   #$01       ;2
-:L9204   sty:  $00fe      ;4
+:L9204   sty   ff_dir1      ;4
          jsr   L9150      ;6
          lda   L9320      ;4
          sta   L932C      ;4
@@ -8314,7 +8314,7 @@ L91A8    jsr   L9166      ;6
          jmp   :L925B     ;3
 
 :L923F   lda   L9329      ;4
-         sta:  $00ff      ;4
+         sta   ff_dir2      ;4
          rts              ;6
 
 :L9246   lda   L932E      ;4
@@ -8331,51 +8331,51 @@ L91A8    jsr   L9166      ;6
          lda   L9321      ;4
          beq   :L9275     ;2+
          lda   L9324      ;4
-         ldy:  $00fd      ;4
+         ldy   ff_stack      ;4
          sta   FF_STACK_X,y    ;5
          lda   L9323      ;4
          sta   FF_STACK_Y,y    ;5
-         inc:  $00fd      ;6
+         inc   ff_stack      ;6
 :L9275   lda   L9329      ;4
-         sta:  $00ff      ;4
+         sta   ff_dir2      ;4
          rts              ;6
 
 :L927C   lda   #$00       ;2
          sta   L9321      ;4
-         lda:  $0006      ;4
+         lda   ff_xpos      ;4
          sta   L9327      ;4
-         lda:  $0007      ;4
+         lda   ff_ypos      ;4
          sta   L9328      ;4
          lda   L9324      ;4
-         sta:  $0006      ;4
+         sta   ff_xpos      ;4
          lda   L9323      ;4
-         sta:  $0007      ;4
+         sta   ff_ypos      ;4
          lda   #$01       ;2
-         sta:  $00ff      ;4
+         sta   ff_dir2      ;4
 :L929E   jsr   L9166      ;6
          lda   L9320      ;4
          bne   :L92AB     ;2+
          lda   #$01       ;2
          sta   L9321      ;4
-:L92AB   inc:  $00ff      ;6
-         lda:  $00ff      ;4
+:L92AB   inc   ff_dir2      ;6
+         lda   ff_dir2      ;4
          cmp   #$05       ;2
          bne   :L929E     ;2+
          lda   #$01       ;2
-         sta:  $00fe      ;4
+         sta   ff_dir1      ;4
 :L92BA   jsr   L9150      ;6
          lda   L9320      ;4
          bne   :L92C7     ;2+
          lda   #$01       ;2
          sta   L9321      ;4
-:L92C7   inc:  $00fe      ;6
-         lda:  $00fe      ;4
+:L92C7   inc   ff_dir1      ;6
+         lda   ff_dir1      ;4
          cmp   #$05       ;2
          bne   :L92BA     ;2+
          lda   L9327      ;4
-         sta:  $0006      ;4
+         sta   ff_xpos      ;4
          lda   L9328      ;4
-         sta:  $0007      ;4
+         sta   ff_ypos      ;4
          rts              ;6
 
 CALC_GR_SCANLINE
