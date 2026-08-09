@@ -62,7 +62,7 @@ joy_y       = $07
 tmp0        = $08
 tmp1        = $09
 
-* Available ZP locations: $ec - $ef
+* Available ZP locations: $ed - $ef
 
 * ProDOS entry point
 MLI           equ $bf00

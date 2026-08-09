@@ -6,6 +6,8 @@
          cyc
          put   COMMON.S
 
+GR_PTMP  =   $EC
+
 * The first table is the scanline table which is 192 bytes
 * thus there is enough space for a 21 entry jmp table before
 * the first table while avoiding cross page access.
@@ -55,21 +57,25 @@ Initialize_lcl
 
 
 GrScanline_lcl
-         ldy   gr_ypos
-         sty   gr_LastYPos         
+         sty   GR_PTMP
+         sta   gr_LastYPos
+         tay
          lda   ScanlineTblHI,Y
          sta   HI
          lda   ScanlineTblLO,Y
          sta   LO
+         ldy   GR_PTMP
          rts
 
 GrNextScanline_lcl
+         sty   GR_PTMP
          inc   gr_LastYPos
          ldy   gr_LastYPos
          lda   ScanlineTblHI,Y
          sta   HI
          lda   ScanlineTblLO,Y
          sta   LO
+         ldy   GR_PTMP
          rts
 
 tmp_x    = tmp0

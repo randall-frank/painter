@@ -6691,7 +6691,7 @@ DRAW_CROSS
          sta   X_POS      ;4
          jsr   DIVIDE7    ;6
          lda   CROSS_Y    ;3
-         jsr   CALC_GR_SCANLINE ;6
+         jsr   GrScanline ;6
          txa              ;2
          asl   A          ;2
          asl   A          ;2
@@ -6705,7 +6705,7 @@ DRAW_CROSS
          sta   UTILITY_INDEX ;4
 :L813A   ldy   CROSS_INDEX ;4
          jsr   CROSS_SCANLINE ;6
-         jsr   INC_GR_SCANLINE ;6
+         jsr   GrNextScanline ;6
          dec   UTILITY_INDEX ;6
          bne   :L813A     ;2+
          rts              ;6
@@ -6729,14 +6729,14 @@ ERASE_CROSS
          sta   X_POS      ;4
          jsr   DIVIDE7    ;6
          lda   CROSS_Y    ;3
-         jsr   CALC_GR_SCANLINE ;6
+         jsr   GrScanline ;6
          lda   #$09       ;2
          sta   UTILITY_INDEX ;4
          sty   CROSS_INDEX ;4
          ldx   #$00       ;2
 :L8177   ldy   CROSS_INDEX ;4
          jsr   ERASE_CROSS_SCANLINE ;6
-         jsr   INC_GR_SCANLINE ;6
+         jsr   GrNextScanline ;6
          dec   UTILITY_INDEX ;6
          bne   :L8177     ;2+
          rts              ;6
@@ -6810,7 +6810,7 @@ PLOT_POINT
          iny              ;2
          iny              ;2
          tya              ;2
-         jsr   CALC_GR_SCANLINE ;6
+         jsr   GrScanline ;6
          ldy   CROSS_X    ;3
          iny              ;2
          iny              ;2
@@ -6938,7 +6938,7 @@ G_MOVE_DONE
 DRAW_GREMLIN
          ldy   UTILITY_INDEX ;4
          lda   GREMLIN_Y,y ;4+
-         jsr   CALC_GR_SCANLINE ;6
+         jsr   GrScanline ;6
          lda   GREMLIN_X,y ;4+
          sta   X_POS      ;4
          jsr   DIVIDE7    ;6
@@ -6954,7 +6954,7 @@ DRAW_GREMLIN
          lda   #$0a       ;2  9 lines
          sta   LINE_COUNT ;4
 :L831B   jsr   SCANLINE   ;6
-         jsr   INC_GR_SCANLINE ;6
+         jsr   GrNextScanline ;6
          dec   LINE_COUNT ;6
          bne   :L831B     ;2+
          rts              ;6
@@ -6975,7 +6975,7 @@ SCANLINE_LOOP
 GREMLIN_MASK_CHECK
          ldy   UTILITY_INDEX ;4
          lda   GREMLIN_Y,y ;4+
-         jsr   CALC_GR_SCANLINE ;6
+         jsr   GrScanline ;6
          lda   GREMLIN_X,y ;4+
          sta   X_POS      ;4
          jsr   DIVIDE7    ;6
@@ -6994,7 +6994,7 @@ GREMLIN_MASK_CHECK
          sta   LINE_COUNT ;4
 MASK_LOOP
          jsr   MASK_SCANLINE ;6
-         jsr   INC_GR_SCANLINE ;6
+         jsr   GrNextScanline ;6
          dec   LINE_COUNT ;6
          bne   MASK_LOOP  ;2+
          rts              ;6
@@ -7032,42 +7032,42 @@ DRAW_BACKGROUND
          lda   MIXCLR     ;4
          lda   #$10       ;2
          sta   UTILITY_INDEX ;4
-         jsr   CALC_GR_SCANLINE ;6  Y in ACC
+         jsr   GrScanline ;6  Y in ACC
 :L83B1   ldy   #$28       ;2  Draw the top white band
 :L83B3   dey              ;2
          lda   #$7f       ;2
          sta   (GR_LOW),y ;6
          cpy   #$00       ;2
          bne   :L83B3     ;2+
-         jsr   INC_GR_SCANLINE ;6
+         jsr   GrNextScanline ;6
          inc   UTILITY_INDEX ;6
          lda   UTILITY_INDEX ;4
          cmp   #$18       ;2
          bne   :L83B1     ;2+
          lda   #$b8       ;2
          sta   UTILITY_INDEX ;4
-         jsr   CALC_GR_SCANLINE ;6
+         jsr   GrScanline ;6
 :L83D1   ldy   #$28       ;2  Draw the lower white band
 :L83D3   dey              ;2
          lda   #$7f       ;2
          sta   (GR_LOW),y ;6
          cpy   #$00       ;2
          bne   :L83D3     ;2+
-         jsr   INC_GR_SCANLINE ;6
+         jsr   GrNextScanline ;6
          inc   UTILITY_INDEX ;6
          lda   UTILITY_INDEX ;4
          cmp   #$c0       ;2
          bne   :L83D1     ;2+
          lda   #$18       ;2
          sta   UTILITY_INDEX ;4
-         jsr   CALC_GR_SCANLINE ;6
+         jsr   GrScanline ;6
 :L83F1   ldy   #$00       ;2  Left bar
          lda   #$7f       ;2
          sta   (GR_LOW),y ;6
          ldy   #$27       ;2
          sta   (GR_LOW),y ;6  Right bar
          inc   UTILITY_INDEX ;6
-         jsr   INC_GR_SCANLINE ;6
+         jsr   GrNextScanline ;6
          lda   UTILITY_INDEX ;4
          cmp   #$b8       ;2
          bne   :L83F1     ;3+
@@ -7711,14 +7711,14 @@ EXPLODE  inc   CROSS_X    ;5
          rts              ;6
 
 :L88CA   lda   :L88F3     ;4
-         jsr   CALC_GR_SCANLINE ;6
+         jsr   GrScanline ;6
          lda   :L88F2     ;4
          sta   X_POS      ;4
          jsr   DIVIDE7    ;6
          lda   :L88EB,x   ;4+
          eor   (GR_LOW),y ;5+
          sta   (GR_LOW),y ;6
-         jsr   INC_GR_SCANLINE ;6
+         jsr   GrNextScanline ;6
          lda   :L88EB,x   ;4+
          eor   (GR_LOW),y ;5+
          sta   (GR_LOW),y ;6
@@ -8230,7 +8230,7 @@ L9166    lda   #$00       ;2
          lda   FF_YDIR_ADD,y    ;4+
          clc              ;2
          adc   ff_ypos      ;4
-         jsr   CALC_GR_SCANLINE ;6
+         jsr   GrScanline ;6
          pla              ;4
          sta   X_POS      ;4
          jsr   DIVIDE7    ;6
