@@ -1,0 +1,18 @@
+
+0800-1fff - general utility routines: UTILS.S
+          - graphics, I/O, joystick, random, etc
+          - text drawing, scanline tables, font
+
+2000-3FFF - HGR
+4000-5FFF - Splash screen - PAINT_SPLASH.HGR
+6000-6100 - high scores -
+6200-xxxx - game code
+
+
+PAINTER.SYSTEM
+
+2000-2100 - relocate code
+2800-3fff - UTILS.S code to be relocated to 0800
+
+
+

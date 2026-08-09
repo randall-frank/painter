@@ -1,0 +1,63 @@
+
+
+1) replace higher text II
+	a) use code from space paranoia?
+	b) allow width and height doubling (use 2 256 byte X scaling tables)
+2) Dither in the "Painter" Logo
+	a) Re-ordered table of 32 numbers.  In 32 passes, if the low order 5 bits of the addr
+       match the number, then draw the byte
+3) Update Joystick routine to a "increment rate" scheme.
+	a) the "stride" list is how often in 16 frames that DX or DY should be applied
+4) Flickering?
+5) Load/Save highscores???
+	
+ $F3E2 = HGR needed if Higher Text II not called?
+ 
+
+
+
+Additional sound ideas:
+
+
+1. "Pop Goes the Weasel"
+Vibe: Playful, bouncy, and mischievous.
+
+Why it works: It has a natural climax on the "Pop!" moment, which fits perfectly when starting a stage or clearing an objective.
+
+Key Notes (C Major): C E F G | E C | G G F E | D C
+
+2. "The Mexican Hat Dance" (Jarabe Tapatío)
+Vibe: Festive, rapid-fire, and high energy.
+
+Why it works: Shares a similar Latin rhythm and cultural nostalgia as "La Cucaracha". It’s instantly recognizable within just 4 or 5 notes.
+
+Key Notes (C Major): G G C C | E E C C | G G C C | D E D C
+
+3. "The Entertainer" (Scott Joplin)
+Vibe: Whimsical, jaunty, and classic arcade.
+
+Why it works: Ragtime syncopation translates remarkably well to 8-bit sound chips, giving the level a retro, lighthearted feel.
+
+Key Notes (C Major): D D# E C E C E | C D D# E C D E | C
+
+4. "Entry of the Gladiators" (Circus Theme)
+Vibe: Chaotic, silly, and fast-paced.
+
+Why it works: Perfect for a trickier or faster level where the player is dodging hazards in a frenzy.
+
+Key Notes (Chromatic Run): A G# A B A G# A | F E F G F E F | D
+
+5. "Yankee Doodle"
+Vibe: Upbeat, marching tempo, straightforward.
+
+Why it works: Extremely simple scalar motion that is almost impossible to mess up on simple sound hardware.
+
+Key Notes (C Major): C C D E | C E D G | C C D E | C B G
+
+6. "The Can-Can" (Orpheus in the Underworld)
+Vibe: High-speed, repetitive, and frantic.
+
+Why it works: Drives urgency. If a level requires quick movement or dodging fast bugs, this tempo gets the player moving.
+
+Key Notes (C Major): C C C D E D C | D D D E F E D | E E E F G F E
+
