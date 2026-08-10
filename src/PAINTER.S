@@ -24,7 +24,6 @@ MON_CV          equ   $25        ;cursor vertical displacement
 GR_LOW          equ   $26
 GR_HIGH         equ   $27
 MON_COLOR       equ   $30        ;lo-res graphics color
-AS_RAND_BYTE    equ   $9f
 HGR_PAGE        equ   $e6
 HT2_INIT        equ   $07fd
 
@@ -34,19 +33,51 @@ HT2_INIT        equ   $07fd
 * 3 bytes score (two nibble digits/byte), 3 bytes Initials
 
 HIGHSCORES
-         hex   0000000000000000000000000000000000000000000000000000000000000000
-         hex   0000000000000000000000000000000000000000000000000000000000000000
-         hex   0000000000000000000000000000000000000000000000000000000000000000
-         hex   0000000000000000000000000000000000000000000000000000000000000000
-         hex   0000000000000000000000000000000000000000000000000000000000000000
-         hex   0000000000000000000000000000000000000000000000000000000000000000
-         hex   0000000000000000000000000000000000000000000000000000000000000000
-         hex   0000000000000000000000000000000000000000000000000000000000000000
+         asc   "PAINTER1"          ; unused
+         asc   $00, $00, $00, "AAAXX"
+         asc   $00, $00, $00, "AAAXX"
+         asc   $00, $00, $00, "AAAXX"
+         asc   $00, $00, $00, "AAAXX"
+         asc   $00, $00, $00, "AAAXX"
+         asc   $00, $00, $00, "AAAXX"
+         asc   $00, $00, $00, "AAAXX"
+         asc   $00, $00, $00, "AAAXX"
+         asc   $00, $00, $00, "AAAXX"
+         asc   $00, $00, $00, "AAAXX"
+         ds    \
 
 GAME_SETUP
+         jsr   Initialize
          jsr   HGR_CLEAR  ;6
          lda   MIXCLR     ;4
          jmp   TITLEPAGE  ;3
+
+DRAW_COPY
+         lda   #23
+         sta   MON_CV  
+         jsr   MON_VTAB 
+         lda   #1
+         sta   MON_CH
+         ldy   #0
+:loop    lda   TXT_COPY,Y
+         beq   :done
+         jsr   MON_COUT
+         iny
+         jmp   :loop
+:done    ldy   #0
+:loop2   lda   version,Y
+         jsr   MON_COUT
+         iny
+         cpy   #5
+         bne   :loop2
+         lda   #')'
+         jsr   MON_COUT
+         rts
+
+TXT_COPY
+         asc   "Copyright ", $13, " 1984 Randy Frank (v", $00
+
+         put   VERSION.S
 
 MON_COUT
          sta   gr_idx     ; The char to render
@@ -327,6 +358,7 @@ COPY_HGR2
          lda   CROSS_Y    ;3
          cmp   #$40       ;2
          bne   :L62A9     ;2+
+         jsr   DRAW_COPY
          rts              ;6
 
 KEYCHECK 
@@ -707,13 +739,13 @@ NEXT_G_MOVE
          jmp   DO_G_MOVE  ;3
 
 NEW_G_MOVE_DIR
-         jsr   AS_RANDOM  ;6
+         jsr   Random 
          ldy   UTILITY_INDEX ;4
-         lda   AS_RAND_BYTE ;3
+         pha
          and   #$03       ;2
          tax              ;2
          sta   GREMLIN_DIR,y ;5  pick a move direction
-         lda   AS_RAND_BYTE ;3
+         pla
          and   #$0f       ;2
          sta   GREMLIN_TICKS,y ;5  schedule next move
 DO_G_MOVE
@@ -1059,16 +1091,14 @@ PLACE_GREMLIN
          ldx   GENERIC_INDEX ;4
          lda   GREMLIN_LIVE,x ;4+
          beq   :L8671     ;2+
-         jsr   AS_RANDOM  ;6
+         jsr   Random
          ldx   GENERIC_INDEX ;4
-         lda   AS_RAND_BYTE ;3
          and   #$60       ;2
          clc              ;2
          adc   #$14       ;2
          sta   GREMLIN_X,x ;5
-         jsr   AS_RANDOM  ;6
+         jsr   Random
          ldx   GENERIC_INDEX ;4
-         lda   AS_RAND_BYTE ;3
          and   #$70       ;2
          clc              ;2
          adc   #$32       ;2

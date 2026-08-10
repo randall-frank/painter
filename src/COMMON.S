@@ -100,7 +100,6 @@ AS_RANDOM   equ   $efae
 HGR         equ   $F3E2
 HGR_CLEAR   equ   $f3e2
 HPLOT0      equ   $f457
-INC_GR_SCANLINE equ $f504
 HCOLOR      equ   $f6ec
 SETHCOLOR   equ   $f6f0
 MON_WAIT    equ   $fca8      ;delay for (26 + 27*Acc + 5*(Acc*Acc))/2 cycles
