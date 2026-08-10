@@ -4,30 +4,29 @@
          
          put   COMMON.S         
 
-FLG_NO_FILL     equ 1
-FLG_COLLIDE     equ 2
-FLG_NO_GREMLINS equ $80
+FLG_NO_FILL     equ   $01
+FLG_COLLIDE     equ   $02
+FLG_NO_GREMLINS equ   $80
 
-KEY_RETURN      equ $8d
-KEY_CTRL_S      equ $93
-KEY_ESC         equ $9b
-KEY_SPACE       equ $a0
+KEY_RETURN      equ   $8d
+KEY_CTRL_S      equ   $93
+KEY_ESC         equ   $9b
+KEY_SPACE       equ   $a0
 
-FF_STACK_SIZE   equ $d8   
+FF_STACK_SIZE   equ   $d8   
 
-
-TMP0     equ   $00
-TMP1     equ   $01
-CROSS_X  equ   $02
-CROSS_Y  equ   $03
-MON_CH   equ   $24        ;cursor horizontal displacement
-MON_CV   equ   $25        ;cursor vertical displacement
-GR_LOW   equ   $26
-GR_HIGH  equ   $27
-MON_COLOR equ  $30        ;lo-res graphics color
-AS_RAND_BYTE equ $9f
-HGR_PAGE equ   $e6
-HT2_INIT equ   $07fd
+TMP0            equ   $00
+TMP1            equ   $01
+CROSS_X         equ   $02
+CROSS_Y         equ   $03
+MON_CH          equ   $24        ;cursor horizontal displacement
+MON_CV          equ   $25        ;cursor vertical displacement
+GR_LOW          equ   $26
+GR_HIGH         equ   $27
+MON_COLOR       equ   $30        ;lo-res graphics color
+AS_RAND_BYTE    equ   $9f
+HGR_PAGE        equ   $e6
+HT2_INIT        equ   $07fd
 
          org   $6000
 
@@ -549,18 +548,27 @@ L819A    lda   BUTN1      ;4
          asl   A          ;2
          bcc   L81F4      ;2+
          lda   CROSS_X    ;3
-         sta   ff_xpos      ;4
-         inc   ff_xpos      ;6
-         inc   ff_xpos      ;6
+         sta   ff_xpos    ;4
+         inc   ff_xpos    ;6
+         inc   ff_xpos    ;6
          lda   CROSS_Y    ;3
-         sta   ff_ypos      ;4
-         inc   ff_ypos      ;6
-         inc   ff_ypos      ;6
-         inc   ff_ypos      ;6
-         inc   ff_ypos      ;6
-         lda   #$02       ;2
-         sta   ff_color      ;4
-         jsr   FLOODFILL  ;6  Fill starting at 6,7 using color 8
+         sta   ff_ypos    ;4
+         inc   ff_ypos    ;6
+         inc   ff_ypos    ;6
+         inc   ff_ypos    ;6
+         inc   ff_ypos    ;6
+
+         ldx   FILL_COLOR_INDEX
+         inx
+         cpx   #4
+         bne   :color_ok
+         ldx   #0
+:color_ok
+         stx   FILL_COLOR_INDEX
+         lda   FILL_COLOR_TABLE,x
+
+         sta   ff_color   ;4
+         jsr   FLOODFILL  ;6  
          lda   TMP0       ;3
          cmp   FILL_LOW   ;4
          bcc   :L81D4     ;2+
@@ -579,6 +587,11 @@ L819A    lda   BUTN1      ;4
          cld              ;2
          jsr   DISP_FILL_COUNT ;6
          rts              ;6
+
+FILL_COLOR_INDEX
+         dfb   0
+FILL_COLOR_TABLE
+         dfb   1,2,5,6
 
 OUT_OF_FILL
          lda   #FLG_NO_FILL ;2
