@@ -216,8 +216,6 @@ STILL_MOVING
 DISP_HISCORES
          lda   #$0a       ;2  10 highscores in two columns
          sta   HS_NUMBER  ;4
-         lda   #$92       ;2
-         jsr   MON_COUT   ;6
          sta   KBDSTRB    ;4
 :L61FF   lda   HS_NUMBER  ;4
          jsr   DISP_1_HISCORE ;6
@@ -904,7 +902,7 @@ DRAW_BACKGROUND
 :L8413   lda   TXT_SCORE,y ;4+
          jsr   MON_COUT   ;6
          iny              ;2
-         cpy   #$0a       ;2
+         cpy   #$06       ;2
          bne   :L8413     ;2+
          lda   #$1f       ;2
          sta   MON_CH     ;3
@@ -912,7 +910,7 @@ DRAW_BACKGROUND
 :L8424   lda   TXT_FILL,y ;4+
          jsr   MON_COUT   ;6
          iny              ;2
-         cpy   #$0b       ;2
+         cpy   #$09       ;2
          bne   :L8424     ;2+
          lda   #$00       ;2
          jsr   GREMLIN_DEAD ;6
@@ -958,14 +956,6 @@ GREMLIN_DEAD
          lda   #$00       ;2
          sta   MON_CV     ;3
          jsr   MON_VTAB   ;6
-         lda   #$92       ;2
-         jsr   MON_COUT   ;6
-         lda   #$85       ;2
-         jsr   MON_COUT   ;6
-         lda   #$83       ;2
-         jsr   MON_COUT   ;6
-         lda   #$b1       ;2
-         jsr   MON_COUT   ;6
          ldy   #$00       ;2
 G_DEAD_SCORE_LOOP
          lda   CURRENT_SCORE_HI,y ;4+
@@ -990,14 +980,6 @@ DISP_FILL_COUNT
          lda   #$01       ;2
          sta   MON_CV     ;3
          jsr   MON_VTAB   ;6
-         lda   #$92       ;2
-         jsr   MON_COUT   ;6
-         lda   #$97       ;2
-         jsr   MON_COUT   ;6
-         lda   #$83       ;2
-         jsr   MON_COUT   ;6
-         lda   #$b2       ;2
-         jsr   MON_COUT   ;6
          ldy   #$00       ;2
 DISP_FILL_LOOP
          lda   FILL_LOW,y ;4+ Draw fill count number
@@ -1016,13 +998,10 @@ DISP_FILL_LOOP
          bne   DISP_FILL_LOOP ;2+
          rts              ;6
 
-TXT_FILL dfb   $92
-         asc   "FILL LEFT"
+TXT_FILL
+         asc   "Paint Lvl"
 TXT_SCORE
-         dfb   $92
-         dfb   $85
-         dfb   $83
-         asc   "1SCORE:"
+         asc   "Score:"
 CURRENT_SCORE_HI
          dfb   $00
 CURRENT_SCORE_MID
@@ -1158,7 +1137,7 @@ DISP_GAMEOVER
 :L86E5   lda   TXT_GAMEOVER,y ;4+
          jsr   MON_COUT   ;6
          iny              ;2
-         cpy   #$0a       ;2
+         cpy   #$09       ;2
          bne   :L86E5     ;2+
          ldx   #$20       ;2
 :L86F2   lda   #$f0       ;2
@@ -1168,8 +1147,7 @@ DISP_GAMEOVER
          rts              ;6
 
 TXT_GAMEOVER
-         dfb   $85
-         asc   "GAME OVER"
+         asc   "Game Over"
 
 NEXT_BOARD
          jsr   L87A1      ;6
@@ -1212,7 +1190,7 @@ DISP_NEXTBOARD_TEXT
          lda   TXT_READY,y ;4+ 'Ready?' text
          jsr   MON_COUT   ;6
          iny              ;2
-         cpy   #$07       ;2
+         cpy   #$06       ;2
          bne   :L874A     ;2+
          lda   #$0a       ;2
          sta   MON_CV     ;3
@@ -1275,12 +1253,11 @@ L87A1    lda   FILL_HIGH  ;4
          jmp   :L87AC     ;3
 
 TXT_READY
-         dfb   $85
-         asc   "READY?"
+         asc   "Ready?"
 TXT_LEVEL
-         asc   "LEVEL:"
+         asc   "Level:"
 TXT_BOARD
-         asc   "BOARD:"
+         asc   "Board:"
 
 LEVEL_LIVE_GREMLIN_TABLE
          hex   0001010000260020 ;8 bytes/level, 10 levels
@@ -1469,8 +1446,7 @@ DISP_NO_FILL
          rts              ;6
 
 TXT_OUTOFFILL
-         dfb   $85
-         asc   "OUT OF FILL"
+         asc   "Out of Paint"
 
          ds    \
 SOUND_TABLE
