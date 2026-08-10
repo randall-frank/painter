@@ -7215,175 +7215,7 @@ LEVEL_NUMBER
          dfb   $00
 FRAME_STATE
          dfb   $00        ;FLG_^
-         asc   "FLOW"
-         dfb   $00
-         asc   "PARAMETER(S) OMITTED"
-         dfb   $00
-         asc   "UNKNOWN COMMAND"
-         dfb   $00
-         asc   " ERROR",878d
-         dfb   $00
-         asc   "ASSM,S6,D1",8d
-         dfb   $00
-         asc   "EDITOR,S6,D1",8d
-         dfb   $00
-         dfb   $a4
-         dfb   $24
-         dfb   $b1
-         dfb   $28
-         dfb   $6c
-         dfb   $38
-         dfb   $00
-         dfb   $48
-         dfb   $c9
-         dfb   $e0
-         dfb   $90
-         dfb   $02
-         dfb   $29
-         dfb   $1f
-         dfb   $48
-         dfb   $b1
-         dfb   $28
-         dfb   $c9
-         dfb   $df
-         dfb   $f0
-         dfb   $05
-         dfb   $68
-         dfb   $a9
-         dfb   $df
-         dfb   $30
-         dfb   $01
-         dfb   $68
-         dfb   $91
-         dfb   $28
-         dfb   $68
-         dfb   $e6
-         dfb   $4e
-         dfb   $d0
-         dfb   $0c
-         dfb   $e6
-         dfb   $4f
-         dfb   $48
-         dfb   $a9
-         dfb   $3f
-         dfb   $25
-         dfb   $4f
-         dfb   $c9
-         dfb   $01
-         dfb   $68
-         dfb   $90
-         dfb   $d9
-         dfb   $2c
-         dfb   $00
-         dfb   $c0
-         dfb   $10
-         dfb   $eb
-         dfb   $91
-         dfb   $28
-         dfb   $ad
-         dfb   $00
-         dfb   $c0
-         dfb   $2c
-         dfb   $10
-         dfb   $c0
-         asc   '`%R,'
-         dfb   $05
-         dfb   $52
-         dfb   $85
-         dfb   $52
-         dfb   $60
-         dfb   $8d
-         dfb   $5c
-         dfb   $c0
-         dfb   $a9
-         dfb   $80
-         dfb   $20
-         dfb   $6d
-         dfb   $10
-         dfb   $20
-         dfb   $31
-         dfb   $10
-         asc   '$R02'
-         dfb   $c9
-         dfb   $df
-         dfb   $b0
-         dfb   $2e
-         dfb   $c9
-         dfb   $dd
-         dfb   $b0
-         dfb   $08
-         dfb   $c9
-         dfb   $db
-         dfb   $b0
-         dfb   $26
-         dfb   $c9
-         dfb   $c0
-         dfb   $d0
-         dfb   $03
-         dfb   $49
-         dfb   $10
-         dfb   $18
-         dfb   $90
-         dfb   $0b
-         dfb   $24
-         dfb   $52
-         dfb   $70
-         dfb   $19
-         dfb   $2c
-         dfb   $63
-         dfb   $c0
-         dfb   $10
-         dfb   $14
-         dfb   $09
-         dfb   $20
-         dfb   $c9
-         dfb   $94
-         dfb   $f0
-         dfb   $cd
-         dfb   $c9
-         dfb   $97
-         dfb   $d0
-         dfb   $0a
-         dfb   $a9
-         dfb   $40
-         dfb   $20
-         dfb   $70
-         dfb   $10
-         dfb   $8d
-         dfb   $5d
-         dfb   $c0
-         dfb   $d0
-         dfb   $c7
-         dfb   $60
-         dfb   $a9
-         dfb   $87
-         dfb   $20
-         dfb   $ed
-         dfb   $fd
-         dfb   $20
-         dfb   $31
-         dfb   $10
-         asc   "I ptI",8d,"p"
-         dfb   $02
-         dfb   $85
-         dfb   $53
-         dfb   $a5
-         dfb   $53
-         dfb   $20
-         dfb   $ed
-         dfb   $fd
-         dfb   $20
-         dfb   $8e
-         dfb   $fd
-         dfb   $4c
-         dfb   $04
-         dfb   $11
-         dfb   $6c
-         dfb   $33
-         dfb   $fd
-         dfb   $20
-         dfb   $31
-
+        
 PLAYAGAME
          lda   #$02       ;2
          sta   NUMBER_LIVES ;4
@@ -7624,6 +7456,7 @@ TXT_LEVEL
          asc   "LEVEL:"
 TXT_BOARD
          asc   "BOARD:"
+
 LEVEL_LIVE_GREMLIN_TABLE
          hex   0001010000260020 ;8 bytes/level, 10 levels
          hex   0001010100260020 ;0 = unused
@@ -7634,6 +7467,7 @@ LEVEL_LIVE_GREMLIN_TABLE
          hex   0001010101180010
          hex   0001010101180008
          hex   0001010101150002
+
 SOUND_LENGTH
          dfb   $00
 GENERIC_INDEX
@@ -7811,95 +7645,8 @@ DISP_NO_FILL
 
 TXT_OUTOFFILL
          dfb   $85
-         asc   "OUT OF FILLRive"
-         dfb   $16
-         dfb   $00
-         dfb   $04
-         asc   "Delete"
-         dfb   $04
-         dfb   $00
-         dfb   $16
-         dfb   $c5
-         dfb   $ce
-         dfb   $c4
-         dfb   $00
-         dfb   $38
-         asc   "Edit"
-         dfb   $04
-         dfb   $06
-         dfb   $00
-         dfb   $30
-         asc   "FILE"
-         dfb   $00
-         dfb   $36
-         asc   "Find"
-         dfb   $04
-         dfb   $06
-         dfb   $00
-         dfb   $2c
-         asc   "HImem="
-         dfb   $16
-         dfb   $00
-         dfb   $18
-         asc   "Insert"
-         dfb   $02
-         dfb   $00
-         dfb   $14
-         asc   "LENgth"
-         dfb   $00
-         dfb   $26
-         asc   "LOmem="
-         dfb   $16
-         dfb   $00
-         dfb   $1a
-         asc   "LOaD"
-         dfb   $0a
-         dfb   $00
-         dfb   $10
-         asc   "List"
-         dfb   $04
-         dfb   $00
-         dfb   $28
-         dfb   $cd
-         dfb   $cf
-         dfb   $ce
-         dfb   $00
-         dfb   $0a
-         dfb   $ce
-         dfb   $c5
-         dfb   $d7
-         dfb   $00
-         dfb   $1c
-         dfb   $d0
-         dfb   $d2
-         dfb   $a3
-         dfb   $16
-         dfb   $ac
-         dfb   $0e
-         dfb   $00
-         dfb   $3a
-         asc   "Print"
-         dfb   $04
-         dfb   $00
-         dfb   $2e
-         asc   "Replace"
-         dfb   $04
-         dfb   $00
-         dfb   $34
-         asc   "SLot"
-         dfb   $16
-         dfb   $00
-         dfb   $06
-         asc   "SaVE"
-         dfb   $04
-         dfb   $12
-         dfb   $00
-         dfb   $12
-         asc   "TRuncOFf"
-         dfb   $00
-         dfb   $0c
-         dfb   $d4
-         dfb   $d2
+         asc   "OUT OF FILL"
+
          ds    \
 SOUND_TABLE
          hex   6464646464016464
