@@ -44,10 +44,14 @@ FontBase
 
          ds    \
 
+         put   SCALED_BYTE.S    ; $200 bytes (scale a HGR byte by 2 in X dir)
+
+         ds    \
+
 PDOS_io_buffer                  ; ProDOS I/O buffer: 1K, page aligned
          ds    1024
 
-         ds    \                ; this should result in alignment with $1400
+         ds    \                ; this should result in alignment
 
 * Initialize all game systems
 Initialize_lcl
@@ -142,35 +146,6 @@ DrawChar_lcl
          ldy   gr_xpos
 fth_text lda   FontBase,x
 sta_text sta   $ffff,y
-         inc   gr_idx
-         inx   
-         cpx   #8
-         bne   ]line
-         rts
-
-DrawCharScaled_lcl
-         lda   #>FontBase
-         lsr
-         lsr
-         sta   ft2_text+2
-         lda   gr_idx
-         sta   ft2_text+1
-         asl   ft2_text+1
-         asl   ft2_text+1
-         rol   ft2_text+2
-         asl   ft2_text+1
-         rol   ft2_text+2
-         ldx   #0
-         lda   gr_ypos
-         sta   gr_idx
-]line    ldy   gr_idx
-         lda   ScanlineTblHI,y
-         sta   st2_text+2
-         lda   ScanlineTblLO,y
-         sta   st2_text+1
-         ldy   gr_xpos
-ft2_text lda   FontBase,x
-st2_text sta   $ffff,y
          inc   gr_idx
          inx   
          cpx   #8
