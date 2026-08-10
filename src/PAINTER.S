@@ -47,7 +47,31 @@ GAME_SETUP
          jsr   HGR_CLEAR  ;6
          lda   MIXCLR     ;4
          jmp   TITLEPAGE  ;3
-         
+
+MON_COUT
+         sta   gr_idx     ; The char to render
+         lda   MON_CH     ; HPOS
+         inc   MON_CH     ; bump HPOS
+         sta   gr_xpos
+         tya              ; protect x and y
+         pha
+         txa
+         pha
+         jsr   DrawChar
+         pla
+         tax
+         pla
+         tay
+         rts
+
+MON_VTAB
+         lda   MON_CV     ; VTAB*8 -> pixel Y
+         asl
+         asl
+         asl
+         sta   gr_ypos
+         rts   
+
 CHECK_HS lda   #>HIGHSCORES ;2
          sta   TMP1       ;3
          lda   #$01       ;2
@@ -265,7 +289,7 @@ TITLEPAGE
          jsr   COPY_HGR2  ;6
          jsr   DISP_HISCORES ;6
 DO_TITLE
-                          ; jsr   DITHERNAME ;6
+                          ; jsr   DITHERNAME ;6   TODO
          ldy   #$ff       ;2  Wait awhile for 'start'  before redisplaying title
 L6278    ldx   #$ff       ;2
 CHECK_SPACE

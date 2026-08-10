@@ -104,6 +104,3 @@ INC_GR_SCANLINE equ $f504
 HCOLOR      equ   $f6ec
 SETHCOLOR   equ   $f6f0
 MON_WAIT    equ   $fca8      ;delay for (26 + 27*Acc + 5*(Acc*Acc))/2 cycles
-
-MON_VTAB    equ   $fc22      ;tab to row specified in CV
-MON_COUT    equ   $fded      ;print Acc to output device via $36-37
