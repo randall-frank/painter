@@ -7469,7 +7469,7 @@ INLINE_CLICK
          bne   PING_DONE  ;2+
          ldy   SOUND_FETCH+2 ;4  Bump sound fetch hi byte
          iny              ;2
-         cpy   #>SOUND_TABLE+$300 ;2
+         cpy   #>SOUND_TABLE_END ;2
          bne   :L86B3     ;2+
          ldy   #>SOUND_TABLE ;2
 :L86B3   sty   SOUND_FETCH+2 ;4
@@ -7998,6 +7998,7 @@ SOUND_TABLE
          hex   3741414141414141
          hex   4b4b4b4b4b4b4b4b
          hex   4b4b4b4b4b4b4b4b
+SOUND_TABLE_END
          DS    \
 GREMLIN_MASKS
          hex   4601002800007c00
