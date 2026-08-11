@@ -22,7 +22,7 @@ TGTHI    =     3
          LDX   #$18
          JSR   MOVEMEM
 * Start the game                           
-         JMP   $6100
+         JMP   $4100
 
 MOVEMEM  LDY   #$00
 MOVELOOP LDA   (SRCLO),Y

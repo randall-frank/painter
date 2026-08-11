@@ -336,6 +336,7 @@ DrawDither_lcl
          ; then draw, otherwise, later pass
          ldx   dither_idx   
          lda   BlockFetch+1
+         eor   tmp_cnt
          and   #$1f       ; only 64 char table
          cmp   dither_table,x
          bne   :nodraw

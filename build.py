@@ -100,7 +100,7 @@ if not prerequisites:
 
 # Set the version number and start the build process
 # Must be 5 characters
-version = [0,0,1]
+version = [0,1,0]
 s=""
 for v in version:
     s += f"{int(v):02x}0a"
@@ -139,21 +139,22 @@ os.chdir(orig_dir)
 log.info("Building PAINTER.SYSTEM(SYS#ff) file...")
 
 # Build 'PAINTER.SYSTEM,TSYS' from bins
-# size is $4000+length of PAINTER#066000
-with open("bin/PAINTER#066000", "rb") as f:
+# size is $4000+length of PAINTER#064000
+with open("bin/PAINTER#064000", "rb") as f:
     game_data = f.read()
 with open("bin/LOADER#062000", "rb") as f:
     loader_data = f.read()
 with open("bin/UTILS#060800", "rb") as f:
     utils_data = f.read()
-with open("src/PAINT_SPLASH.HGR", "rb") as f:
-    splash_data = f.read()
     
-data = bytearray(0x4000+len(game_data))
-data[0x4000:0x4000+len(game_data)] = game_data
+data = bytearray(0x2000+len(game_data))
+data[0x2000:0x2000+len(game_data)] = game_data
 data[0:0+len(loader_data)] = loader_data
 data[0x0800:0x0800+len(utils_data)] = utils_data
-data[0x2000:0x2000+len(splash_data)] = splash_data
+
+#with open("src/PAINT_SPLASH.HGR", "rb") as f:
+#    splash_data = f.read()
+# #data[0x2000:0x2000+len(splash_data)] = splash_data
 
 outname = "SYSTEM/PAINTER.SYSTEM#ff2000"
 with open(outname, "wb") as fp:

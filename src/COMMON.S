@@ -17,7 +17,6 @@ GrScanline     = $82a
 GrNextScanline = $82d
 DrawCharX      = $830
 
-
 LO          = $26
 HI          = $27
 

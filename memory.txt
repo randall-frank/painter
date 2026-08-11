@@ -23,6 +23,25 @@ TODO:
     Colorize text
     Center other text (use text box?)
     Initial descriptions...
-    Dither in splash screen
     Button info?
     Add other music
+
+https://hgrtool.art/imgedit.html
+
+Block info:
+
+Painter rect
+    35 (5), 5
+    252 (36), 62
+    
+    deltas (bytes, scanlines): 
+    31, 57
+    6E7
+
+Splash rect
+    49 (7), 73
+    224 (32),182
+
+    deltas (bytes, scanlines):
+    25, 109
+    AA5

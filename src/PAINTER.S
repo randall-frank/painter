@@ -1,5 +1,5 @@
 
-         dsk   ../bin/PAINTER#066000
+         dsk   ../bin/PAINTER#064000
          typ   $06
          
          put   COMMON.S         
@@ -29,7 +29,7 @@ MON_COLOR       equ   $30        ;lo-res graphics color
 HGR_PAGE        equ   $e6
 
 
-         org   $6000
+         org   $4000
 
 * 8 bytes/highscore, 10 highscores
 * 3 bytes score (two nibble digits/byte), 3 bytes Initials
@@ -55,6 +55,33 @@ GAME_SETUP
          jsr   LoadHiscores  
          jmp   TITLEPAGE  
 
+* Utility function to generate a "massdraw" format image
+
+GRAB
+         lda   #73
+         sta   gr_ypos
+:l0      lda   gr_ypos
+         jsr   GrScanline
+         lda   HI
+         eor   #$60
+         sta   HI
+         ldy   #7
+:l1      lda   (LO),Y
+         jsr   GRAB1
+         iny
+         cpy   #32
+         bne   :l1
+         inc   gr_ypos
+         lda   gr_ypos
+         cmp   #182
+         bne   :l0
+         rts
+GRAB1    sta   $8000
+         inc   GRAB1+1
+         bne   :l2
+         inc   GRAB1+2
+:l2      rts
+
 LoadHiscores
          lda    #$00
          sta    io_src_addr_hi ; seek
@@ -77,7 +104,7 @@ DRAW_COPY
          lda   #23
          sta   MON_CV  
          jsr   MON_VTAB 
-         lda   #1
+         lda   #2
          sta   MON_CH
          ldy   #0
 :loop    lda   TXT_COPY,Y
@@ -96,7 +123,7 @@ DRAW_COPY
          rts
 
 TXT_COPY
-         asc   "Copyright ", $13, " 1984 Randy Frank (v", $00
+         asc   "Copyright ", $13, " 1984 Randy Frank (", $00
 
          put   VERSION.S
 
@@ -220,11 +247,14 @@ STILL_MOVING
          jsr   INSERT_HISCORE ;6
          ldy   INSERT_POINT ;4
          cpy   WHICH_SCORE ;4
-         beq   :L6176     ;2+
+         beq   :newhigh     ;2+
          dec   INSERT_POINT ;6
          jmp   STILL_MOVING ;3
 
-:L6176   lda   WHICH_SCORE ;4
+:newhigh jsr   HGR_CLEAR
+         lda   MIXCLR
+         jsr   DRAW_BUCKET
+         lda   WHICH_SCORE ;4
          asl   A          ;2
          asl   A          ;2
          asl   A          ;2
@@ -235,7 +265,7 @@ STILL_MOVING
          iny              ;2
          cpy   #$03       ;2
          bne   :L6180     ;2+
-         lda   #$a0       ;2  insert three spaces
+         lda   #$5f       ;2  insert three spaces
          sta   (TMP0),y   ;6
          iny              ;2
          sta   (TMP0),y   ;6
@@ -297,7 +327,8 @@ INITIALS
          rts              ;6
 
 DISP_HISCORES
-         lda   #$0a       ;2  10 highscores in two columns
+         jsr   HIGHSCORE_BOX
+         lda   #$0a       ;2  10 highscores in one column
          sta   HS_NUMBER  ;4
          sta   KBDSTRB    ;4
 :L61FF   lda   HS_NUMBER  ;4
@@ -306,6 +337,50 @@ DISP_HISCORES
          bne   :L61FF     ;3+
          rts              ;6
 
+TB_X     dfb   0
+TB_Y     dfb   0
+TB_IDX   dfb   0
+
+TXT_TOP  dfb   $14,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$15,$00
+TXT_TIT  dfb   $19,$48,$69,$67,$68,$73,$63,$6f,$72,$65,$73,$19,$00
+TXT_MID  dfb   $1B,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$1D,$00
+TXT_BLK  dfb   $19,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$19,$00
+         dfb   $19,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$19,$00
+         dfb   $19,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$19,$00
+         dfb   $19,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$19,$00
+         dfb   $19,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$19,$00
+         dfb   $19,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$19,$00
+         dfb   $19,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$19,$00
+         dfb   $19,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$19,$00
+         dfb   $19,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$19,$00
+         dfb   $19,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$19,$00
+TXT_BOT  dfb   $16,$18,$18,$18,$18,$18,$18,$18,$18,$18,$18,$17,$00,$ff
+
+HIGHSCORE_BOX 
+         lda   #0
+         sta   TB_IDX
+         lda   #8
+         sta   TB_Y
+:line    lda   #27
+         sta   TB_X
+         lda   TB_Y
+         sta   MON_CV
+         jsr   MON_VTAB
+:char    lda   TB_X
+         sta   MON_CH
+         inc   TB_X
+         ldx   TB_IDX
+         inc   TB_IDX
+         lda   TXT_TOP,x
+         beq   :nextl
+         cmp   #$ff
+         bne   :drawit
+         rts
+:nextl   inc   TB_Y
+         jmp   :line
+:drawit  jsr   MON_COUT
+         jmp   :char
+         
 DISP_1_HISCORE
          tay              ;2
          lda   HS_VTAB,y  ;4+
@@ -352,27 +427,16 @@ HS_NUMBER
          dfb   $00
 INITIALS_HPOS    dfb   $00
 HS_VTAB  dfb   $00
-         dfb   $0d        ;VTAB values for each high score
-         dfb   $0f
-         dfb   $11
-         dfb   $13
-         dfb   $15
-         dfb   $0d
-         dfb   $0f
-         dfb   $11
-         dfb   $13
-         dfb   $15
+         dfb   11,12,13,14,15,16,17,18,19,20
 HS_HTAB  dfb   $00
-         ds    5,$06
-         ds    5,$18
+         ds    10,28
 
 TITLEPAGE
-         jsr   COPY_HGR2  ;6
-         jsr   DISP_HISCORES ;6
+         jsr   DRAW_BUCKET ;6
 DO_TITLE
-                          ; jsr   DITHERNAME ;6   TODO
+         jsr   DITHERNAME ;6 
          ldy   #$ff       ;2  Wait awhile for 'start'  before redisplaying title
-L6278    ldx   #$ff       ;2
+:wait    ldx   #$ff       ;2
 CHECK_SPACE
          lda   KBD        ;4
          cmp   #KEY_SPACE ;2
@@ -382,36 +446,53 @@ CHECK_SPACE
          dex              ;2
          bne   CHECK_SPACE ;2+
          dey              ;2
-         bne   L6278      ;2+
+         bne   :wait      ;2+
          jmp   TITLEPAGE  ;3
 
 BEGINGAME
          jsr   PLAYAGAME  ;6
-         jsr   COPY_HGR2  ;6  Game Over!
+         jsr   DRAW_BUCKET  ;6 
          jsr   CHECK_HS   ;6
          jmp   DO_TITLE   ;3
 
-COPY_HGR2
-         lda   #$40       ;2
-         sta   TMP1       ;3
-         lda   #$20       ;2
-         sta   CROSS_Y    ;3
-         lda   #$00       ;2
-         sta   TMP0       ;3
-         sta   CROSS_X    ;3
-:L62A9   ldy   #$00       ;2
-:L62AB   iny              ;2
-         lda   (TMP0),y   ;5+
-         sta   (CROSS_X),y ;6
-         cpy   #$00       ;2
-         bne   :L62AB     ;2+
-         inc   TMP1       ;5
-         inc   CROSS_Y    ;5
-         lda   CROSS_Y    ;3
-         cmp   #$40       ;2
-         bne   :L62A9     ;2+
+         put   SPLASH.S
+
+DITHERNAME
+         lda   #>IMG_PAINT
+         sta   gr_addr_hi
+         lda   #<IMG_PAINT
+         sta   gr_addr_lo
+         lda   #5
+         sta   gr_xpos
+         lda   #5
+         sta   gr_ypos
+         jsr   DrawDither
+         rts
+
+DRAW_BUCKET
+         lda   #0
+         sta   gr_idx
+         lda   #5
+         sta   gr_ypos
+         lda   #5
+         sta   gr_xpos
+         lda   #31
+         sta   gr_width
+         lda   #57
+         sta   gr_height
+         jsr   DrawRect
+         lda   #>IMG_SPLASH
+         sta   gr_addr_hi
+         lda   #<IMG_SPLASH
+         sta   gr_addr_lo
+         lda   #1
+         sta   gr_xpos
+         lda   #63
+         sta   gr_ypos
+         jsr   DrawBlock
          jsr   DRAW_COPY
-         rts              ;6
+         jsr   DISP_HISCORES
+         rts
 
 KEYCHECK 
          lda   KBD        ;4
