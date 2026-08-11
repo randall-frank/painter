@@ -28,6 +28,7 @@ GR_PTMP  =   $EC
          jmp   Bye_lcl
          jmp   GrScanline_lcl
          jmp   GrNextScanline_lcl
+         jmp   DrawCharX_lcl
 
          put   SCANLINE_TBL.S   ; 192*2 bytes
 
@@ -57,8 +58,9 @@ PDOS_io_buffer                  ; ProDOS I/O buffer: 1K, page aligned
 Initialize_lcl
          jsr   InitializeIO
          jsr   HGR
+         lda   #0
+         sta   gr_scaling
          jmp   RandInit_lcl
-
 
 GrScanline_lcl
          sty   GR_PTMP
@@ -152,6 +154,68 @@ sta_text sta   $ffff,y
          bne   ]line
          rts
 
+* gr_scaling: GR_SCALE_X, GR_SCALE_Y
+
+gr_line_count dfb 0
+gr_y_loop dfb  0
+
+DrawCharX_lcl
+         lda   #>FontBase   ; set up the fetch address
+         lsr
+         lsr
+         sta   ft2_text+2
+         lda   gr_idx
+         sta   ft2_text+1
+         asl   ft2_text+1
+         asl   ft2_text+1
+         rol   ft2_text+2
+         asl   ft2_text+1
+         rol   ft2_text+2
+
+         lda   #8
+         sta   gr_line_count   ; # of input bytes in a char (outer loops)
+
+         lda   gr_ypos
+         sta   gr_idx      ; gr_idx tracks the current Y location
+
+:top     lda   #1          ; set up Y duplication
+         sta   gr_y_loop
+         lda   gr_scaling
+         and   #GR_SCALE_Y
+         beq   :yloop
+         inc   gr_y_loop
+
+:yloop   ldy   gr_idx
+         lda   ScanlineTblHI,y
+         sta   HI
+         lda   ScanlineTblLO,y
+         sta   LO
+                  
+ft2_text ldx   FontBase   ; data fetch (self modifying code)
+
+         ldy   gr_xpos
+         lda   gr_scaling
+         and   #GR_SCALE_X
+         beq   :normalx
+
+         lda   wide_byte_lo,X ; wide byte plotting
+         sta   (LO),y
+         iny
+         lda   wide_byte_hi,X
+         jmp   :laststa
+
+:normalx txa
+
+:laststa sta   (LO),y
+
+         inc   gr_idx
+         dec   gr_y_loop
+         bne   :yloop      ; scanline duplication
+
+         inc   ft2_text+1  ; next input byte
+         dec   gr_line_count  ; done??
+         bne   :top
+         rts
 
 * Draw a block of pixels at gr_xpos (bytes), gr_ypos using
 * the color index gr_idx.  The block is gr_width bytes wide

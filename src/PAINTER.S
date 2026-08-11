@@ -25,7 +25,7 @@ GR_LOW          equ   $26
 GR_HIGH         equ   $27
 MON_COLOR       equ   $30        ;lo-res graphics color
 HGR_PAGE        equ   $e6
-HT2_INIT        equ   $07fd
+
 
          org   $6000
 
@@ -78,6 +78,32 @@ TXT_COPY
          asc   "Copyright ", $13, " 1984 Randy Frank (v", $00
 
          put   VERSION.S
+
+MON_COUTX
+         sta   gr_idx
+         lda   #GR_SCALE_X
+         sta   gr_scaling
+         jmp   :DrawCharX
+
+MON_COUTXY
+         sta   gr_idx
+         lda   #GR_SCALE_XY
+         sta   gr_scaling
+:DrawCharX         
+         lda   MON_CH     ; HPOS
+         inc   MON_CH     ; bump HPOS by 2
+         inc   MON_CH  
+         sta   gr_xpos
+         tya              ; protect x and y
+         pha
+         txa
+         pha
+         jsr   DrawCharX
+         pla
+         tax
+         pla
+         tay
+         rts        
 
 MON_COUT
          sta   gr_idx     ; The char to render
@@ -932,7 +958,7 @@ DRAW_BACKGROUND
          jsr   MON_VTAB   ;6
          ldy   #$00       ;2
 :L8413   lda   TXT_SCORE,y ;4+
-         jsr   MON_COUT   ;6
+         jsr   MON_COUTXY ;6
          iny              ;2
          cpy   #$06       ;2
          bne   :L8413     ;2+
@@ -996,11 +1022,11 @@ G_DEAD_SCORE_LOOP
          lsr   A          ;2
          lsr   A          ;2
          ora   #$b0       ;2
-         jsr   MON_COUT   ;6
+         jsr   MON_COUTXY ;6
          lda   CURRENT_SCORE_HI,y ;4+
          and   #$0f       ;2
          ora   #$b0       ;2
-         jsr   MON_COUT   ;6
+         jsr   MON_COUTXY ;6
          iny              ;2
          cpy   #$03       ;2
          bne   G_DEAD_SCORE_LOOP ;2+
@@ -1020,11 +1046,11 @@ DISP_FILL_LOOP
          lsr   A          ;2
          lsr   A          ;2
          ora   #$b0       ;2
-         jsr   MON_COUT   ;6
+         jsr   MON_COUTX  ;6
          lda   FILL_LOW,y ;4+
          and   #$0f       ;2
          ora   #$b0       ;2
-         jsr   MON_COUT   ;6
+         jsr   MON_COUTX  ;6
          iny              ;2
          cpy   #$02       ;2
          bne   DISP_FILL_LOOP ;2+
@@ -1955,30 +1981,6 @@ L91A8    jsr   L9166      ;6
          sta   ff_xpos      ;4
          lda   L9328      ;4
          sta   ff_ypos      ;4
-         rts              ;6
-
-CALC_GR_SCANLINE
-         pha              ;3  Slow system to compute the scanline address
-         and   #$c0       ;2
-         sta   GR_LOW     ;3
-         lsr   A          ;2
-         lsr   A          ;2
-         ora   GR_LOW     ;3
-         sta   GR_LOW     ;3
-         pla              ;4
-         sta   GR_HIGH    ;3
-         asl   A          ;2
-         asl   A          ;2
-         asl   A          ;2
-         rol   GR_HIGH    ;5
-         asl   A          ;2
-         rol   GR_HIGH    ;5
-         asl   A          ;2
-         ror   GR_LOW     ;5
-         lda   GR_HIGH    ;3
-         and   #$1f       ;2
-         ora   HGR_PAGE   ;3
-         sta   GR_HIGH    ;3
          rts              ;6
 
 L9300    dfb   $03

@@ -15,6 +15,8 @@ WriteFile      = $824
 Bye            = $827
 GrScanline     = $82a
 GrNextScanline = $82d
+DrawCharX      = $830
+
 
 LO          = $26
 HI          = $27
@@ -40,6 +42,11 @@ gr_addr_hi  = $fd
 gr_width    = $fe
 gr_height   = $ff
 gr_LastYPos = $eb
+gr_scaling  = $ed
+
+GR_SCALE_X  = 1
+GR_SCALE_Y  = 2
+GR_SCALE_XY = 3
 
 * TODO: move these
 ff_color    =  $08
