@@ -21,7 +21,6 @@ PAINTER.SYSTEM
 TODO:
 
     Colorize text
-    Center other text (use text box?)
     Initial descriptions...
     Button info?
     Add other music

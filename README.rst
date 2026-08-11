@@ -35,9 +35,14 @@ and replaced the HRCG with a simpler text drawing routine.
 
 The result is what you see here: Painter, for ProDOS.
 
+.. image:: splash.png
+   :alt: Splash screen banner
+   :align: center
+
 Details
 -------
 The source presented here is written entirely in Merlin 6502 assembly. 
+
 
 Building
 ~~~~~~~~
@@ -64,7 +69,28 @@ One can adjust the pathnames to CiderPress and Merlin at the top of the build.py
 
 Documentation and Issues
 ------------------------
-TDB
+
+Start a game by pressing the spacebar when the "Painter" logo is fully visible.
+
+Gameplay looks like this:
+
+.. image:: gameplay.png
+   :alt: Splash screen banner
+   :align: center
+
+
+Use the joystick to move the cursor around the screen while the 'bugs' move about
+in a random fashion.  The goal is to paint over all of the bugs to get to the
+next board.
+
+You can use button 0 to draw white lines around the bugs.  Button 1 begins "painting"
+at the point of the cursor, filling the enclosed region with paint.  If bugs are in
+the paint, they will die.  
+
+You have a limited amount of paint for each board, so one should try to enclose
+the bugs in tight regions.  If the cursor collides with a bug or you run out of
+paint, you will die.  You have three lives for each game.
+
 
 How to Play
 ~~~~~~~~~~~

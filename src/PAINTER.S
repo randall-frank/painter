@@ -1298,10 +1298,10 @@ STILL_PLAYING
          jmp   NEXT_LIFE  ;3
 
 DISP_GAMEOVER
-         lda   #$0c       ;2
+         lda   #12        ;2
          sta   MON_CV     ;3
          jsr   MON_VTAB   ;6
-         lda   #$0b       ;2
+         lda   #15       ;2
          sta   MON_CH     ;3
          ldy   #$00       ;2
 :L86E5   lda   TXT_GAMEOVER,y ;4+
@@ -1350,10 +1350,10 @@ DRAW_BOARD
          rts              ;6
 
 DISP_NEXTBOARD_TEXT
-         lda   #$08       ;2
+         lda   #10        ;2
          sta   MON_CV     ;3
          jsr   MON_VTAB   ;6
-         lda   #$0f       ;2
+         lda   #16       ;2
          sta   MON_CH     ;3
          ldy   #$00       ;2
 :L874A   nop              ;2
@@ -1362,10 +1362,10 @@ DISP_NEXTBOARD_TEXT
          iny              ;2
          cpy   #$06       ;2
          bne   :L874A     ;2+
-         lda   #$0a       ;2
+         lda   #12        ;2
          sta   MON_CV     ;3
          jsr   MON_VTAB   ;6
-         lda   #$0f       ;2
+         lda   #16        ;2
          sta   MON_CH     ;3
          ldy   #$00       ;2
 :L8763   lda   TXT_LEVEL,y ;4+ 'Level:'
@@ -1376,10 +1376,10 @@ DISP_NEXTBOARD_TEXT
          lda   LEVEL_NUMBER ;4  Display the level number
          ora   #$b0       ;2
          jsr   MON_COUT   ;6
-         lda   #$0c       ;2
+         lda   #14        ;2
          sta   MON_CV     ;3
          jsr   MON_VTAB   ;6
-         lda   #$0f       ;2
+         lda   #16        ;2
          sta   MON_CH     ;3
          ldy   #$00       ;2
 :L8783   lda   TXT_BOARD,y ;4+ 'Board:'
@@ -1597,22 +1597,22 @@ EXPLODE  inc   CROSS_X    ;5
          dfb   $ed
 
 DISP_NO_FILL
-         lda   #$0f       ;2
+         lda   #12        ;2
          sta   MON_CV     ;3
          jsr   MON_VTAB   ;6
-         lda   #$09       ;2
+         lda   #14        ;2
          sta   MON_CH     ;3
          ldy   #$00       ;2
-:L8943   lda   TXT_OUTOFFILL,y ;4+
+:next    lda   TXT_OUTOFFILL,y ;4+
          jsr   MON_COUT   ;6
          iny              ;2
-         cpy   #$0c       ;2
-         bne   :L8943     ;2+
+         cpy   #12        ;2
+         bne   :next     ;2+
          ldx   #$20       ;2
-:L8950   lda   #$f0       ;2
+:delay   lda   #$f0       ;2
          jsr   MON_WAIT   ;6
          dex              ;2
-         bne   :L8950     ;2+
+         bne   :delay     ;2+
          rts              ;6
 
 TXT_OUTOFFILL
