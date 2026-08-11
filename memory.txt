@@ -21,9 +21,10 @@ PAINTER.SYSTEM
 TODO:
 
     Colorize text
-    Initial descriptions...
-    Button info?
+    Initial descriptions... and flashing cursor
+    Button info: more text prompts
     Add other music
+    Better joystick control
 
 https://hgrtool.art/imgedit.html
 

@@ -441,6 +441,9 @@ CHECK_SPACE
          lda   KBD        ;4
          cmp   #KEY_SPACE ;2
          beq   BEGINGAME  ;2+
+         cmp   #KEY_CTRL_B
+         beq   :dobye
+         jsr   SOUNDKEY
          lda   #$05       ;2
          jsr   MON_WAIT   ;6
          dex              ;2
@@ -448,6 +451,7 @@ CHECK_SPACE
          dey              ;2
          bne   :wait      ;2+
          jmp   TITLEPAGE  ;3
+:dobye   jmp   Bye
 
 BEGINGAME
          jsr   PLAYAGAME  ;6
@@ -496,7 +500,7 @@ DRAW_BUCKET
 
 KEYCHECK 
          lda   KBD        ;4
-         cmp   #KEY_CTRL_S ;2
+SOUNDKEY cmp   #KEY_CTRL_S ;2
          bne   :L7F3D     ;2+
          lda   INLINE_CLICK+1 ;4
          eor   #$30       ;2
