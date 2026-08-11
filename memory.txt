@@ -24,9 +24,5 @@ TODO:
     Center other text (use text box?)
     Initial descriptions...
     Dither in splash screen
-    Cursor with white
-    Move cursors (extra players) to the left a bit
     Button info?
     Add other music
-
-
