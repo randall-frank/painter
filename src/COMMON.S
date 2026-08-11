@@ -101,9 +101,7 @@ PADDL1      equ   $C065      ; Read paddle 1 soft switch
 PTRIG       equ   $C070      ; Trigger (start) paddle measurement
 
 * monitor entry points
-WAIT        equ   $FCA8
 MONITOR     equ   $FF69
-AS_RANDOM   equ   $efae
 HGR         equ   $F3E2
 HGR_CLEAR   equ   $f3e2
 HPLOT0      equ   $f457

@@ -635,7 +635,7 @@ nxtswp4
          tax 
 nxtcyc4
          tya 
-         jsr WAIT 
+         jsr MON_WAIT 
          bit SPKR 
          cpx #$80 
          beq exit4 
@@ -726,6 +726,8 @@ WriteFile_lcl
          dfb    MLI_OPENFILE
          da     OpenParams
          bcc    :ok
+         lda    io_src_addr_hi
+         sta    CreateA+1
          jsr    MLI   ; create the file
          dfb    MLI_CREATEFILE
          da     CreateParams
@@ -785,9 +787,9 @@ SeekAddr dw    $0000
 CreateParams
          dfb   7
          dw    Filename
-         dfb   $c3
+         dfb   $e3
          dfb   $06
-         dw    $0000
+CreateA  dw    $0000
          dfb   1
          dw    $0000
          dw    $0000

@@ -16,3 +16,17 @@ PAINTER.SYSTEM
 4000-5fff - Splash screen - PAINT_SPLASH.HGR
 6000-60ff - high scores -
 6100-xxxx - game code
+
+
+TODO:
+
+    Colorize text
+    Center other text (use text box?)
+    Initial descriptions...
+    Dither in splash screen
+    Cursor with white
+    Move cursors (extra players) to the left a bit
+    Button info?
+    Add other music
+
+

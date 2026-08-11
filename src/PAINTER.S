@@ -10,8 +10,10 @@ FLG_NO_GREMLINS equ   $80
 
 KEY_RETURN      equ   $8d
 KEY_CTRL_S      equ   $93
+KEY_CTRL_B      equ   $82
 KEY_ESC         equ   $9b
 KEY_SPACE       equ   $a0
+KEY_BANG        equ   $a1
 
 FF_STACK_SIZE   equ   $d8   
 
@@ -48,9 +50,28 @@ HIGHSCORES
 
 GAME_SETUP
          jsr   Initialize
-         jsr   HGR_CLEAR  ;6
-         lda   MIXCLR     ;4
-         jmp   TITLEPAGE  ;3
+         jsr   HGR_CLEAR  
+         lda   MIXCLR     
+         jsr   LoadHiscores  
+         jmp   TITLEPAGE  
+
+LoadHiscores
+         lda    #$00
+         sta    io_src_addr_hi ; seek
+         lda    #$01      ; one page
+         sta    io_src_count_hi
+         lda    #>HIGHSCORES
+         sta    io_tgt_addr_hi
+         jmp    ReadFile
+
+SaveHiscores
+         lda    #$00
+         sta    io_tgt_addr_hi ; seek
+         lda    #$01      ; one page
+         sta    io_src_count_hi
+         lda    #>HIGHSCORES
+         sta    io_src_addr_hi
+         jmp    WriteFile
 
 DRAW_COPY
          lda   #23
@@ -236,39 +257,44 @@ STILL_MOVING
          lda   HS_HTAB,y  ;4+
          clc              ;2
          adc   #$07       ;2
-         sta   L6256      ;4
+         sta   INITIALS_HPOS     
          lda   #$00       ;2
          sta   HS_NUMBER  ;4
 
-* Prompt for 3 initials
+* Prompt for 3 initials 
+                          ; TODO: prompt for initials (include "RET" to end
 
-:L61BC   lda   HS_NUMBER  ;4
+INITIALS
+         lda   HS_NUMBER  ;4
          clc              ;2
-         adc   L6256      ;4
+         adc   INITIALS_HPOS    
          sta   MON_CH     ;3
 :key_loop 
          bit   KBD        ;4
-         bpl   :key_loop     ;2+
+         bpl   :key_loop  ;2+
          lda   KBD        ;4  Enter initials
 
          bit   KBDSTRB    ;4
          cmp   #KEY_RETURN ;2
-         beq   :L61F1     ;2+
+         beq   :done       ;2+
+         pha
          jsr   MON_COUT   ;6
          ldy   HS_NUMBER  ;4
          iny              ;2
          iny              ;2
          iny              ;2
+         pla
          sta   (TMP0),y   ;6
          inc   HS_NUMBER  ;6
          lda   HS_NUMBER  ;4
          cmp   #$03       ;2
-         bne   :L61BC     ;2+
+         bne   INITIALS   ;2+
          lda   #$00       ;2
          sta   HS_NUMBER  ;4
-         jmp   :L61BC     ;3
+         jmp   INITIALS   ;3
 
-:L61F1   rts              ;6
+:done    jsr   SaveHiscores
+         rts              ;6
 
 DISP_HISCORES
          lda   #$0a       ;2  10 highscores in two columns
@@ -324,7 +350,7 @@ DISP_1_HISCORE
 
 HS_NUMBER
          dfb   $00
-L6256    dfb   $00
+INITIALS_HPOS    dfb   $00
 HS_VTAB  dfb   $00
          dfb   $0d        ;VTAB values for each high score
          dfb   $0f
@@ -1144,6 +1170,13 @@ PAUSE_LOOP
          jsr   KEYCHECK   ;6
          cmp   #KEY_ESC   ;2
          beq   PAUSE_LOOP ;2+
+         cmp   #KEY_BANG
+         bne   :not_mon
+         jsr   MONITOR
+:not_mon cmp   #KEY_CTRL_B
+         bne   :not_bye
+         jmp   Bye
+:not_bye 
          ldx   SOUND_LENGTH ;4  Number of loops for sound
 NEXT_SOUND_COUNT
          ldy   SOUND_LOW  ;4  Get the delay for the current sound index
