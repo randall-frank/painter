@@ -17,16 +17,14 @@ PAINTER.SYSTEM
 6000-60ff - high scores -
 6100-xxxx - game code
 
-
 TODO:
-
     Colorize text
-    Initial descriptions... and flashing cursor
     Button info: more text prompts
     Add other music
     Better joystick control
 
 https://hgrtool.art/imgedit.html
+
 
 Block info:
 
@@ -45,3 +43,27 @@ Splash rect
     deltas (bytes, scanlines):
     25, 109
     AA5
+
+
+Sound values:
+
+$64 (100) = C4
+
+$5A (90)  = D4
+
+$50 (80)  = E4
+
+$4B (75)  = F4
+
+$41 (65)  = G4
+
+$3C (60)  = A4
+
+$37 (55)  = B4
+
+$33 (51)  = C5
+
+$2F (47)  = D5
+
+$2A (42)  = E5
+

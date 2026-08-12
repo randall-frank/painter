@@ -280,7 +280,8 @@ STILL_MOVING
 
 :newhigh jsr   HGR_CLEAR
          lda   MIXCLR
-         jsr   DRAW_BUCKET
+         jsr   DRAW_BUCKET 
+         jsr   FASTNAME
          lda   WHICH_SCORE ;4
          asl   A          ;2
          asl   A          ;2
@@ -319,7 +320,6 @@ STILL_MOVING
          sta   HS_NUMBER  ;4
 
 * Prompt for 3 initials 
-                          ; TODO: prompt for initials (include "RET" to end
 
 INITIALS
          lda   HS_NUMBER  ;4
@@ -327,10 +327,15 @@ INITIALS
          adc   INITIALS_HPOS
          sta   MON_CH     ;3
 :key_loop 
-         bit   KBD        ;4  TODO: blinking cursor (MON_CH, (TMP+HS_NUMBER+3),
-         bpl   :key_loop  ;2+
-         lda   KBD        ;4  Enter initials
+         jsr   DRAW_CURSOR
+         bit   KBD        
+         bpl   :key_loop  
 
+:l0      jsr   DRAW_CURSOR ; make sure to remove the eor cursor
+         lda   CURSOR_STATE
+         bne   :l0
+
+         lda   KBD        ;4  Enter initials
          bit   KBDSTRB    ;4
          cmp   #KEY_RETURN ;2
          beq   :done       ;2+
@@ -353,10 +358,30 @@ INITIALS
 :done    jsr   SaveHiscores
          rts              ;6
 
-CUR_HPOS dfb   0
-CUR_CHAR dfb   0
-CUR_CNT  dfb   0
+CURSOR_STATE  dfb 0
+CURSOR_CNT    dfb 0
 
+DRAW_CURSOR               ; eor a white block over the character
+         inc   CURSOR_CNT
+         beq   :drawit
+         rts
+:drawit  lda   MON_CV
+         asl
+         asl
+         asl
+         jsr   GrScanline
+         ldx   #8
+         ldy   MON_CH
+:loop    lda   (LO),Y
+         eor   #$7f
+         sta   (LO),Y
+         jsr   GrNextScanline
+         dex
+         bne   :loop
+         lda   CURSOR_STATE
+         eor   #1
+         sta   CURSOR_STATE
+         rts
 
 DISP_HISCORES
          jsr   HIGHSCORE_BOX
@@ -455,19 +480,18 @@ DISP_1_HISCORE
          jsr   MON_COUT   ;6
          rts              ;6
 
-HS_NUMBER
-         dfb   $00
-INITIALS_HPOS    dfb   $00
-HS_VTAB  dfb   $00
-         dfb   11,12,13,14,15,16,17,18,19,20
-HS_HTAB  dfb   $00
-         ds    10,28
+HS_NUMBER      dfb   $00
+INITIALS_HPOS  dfb   $00
+
+HS_VTAB        dfb   $00
+               dfb   11,12,13,14,15,16,17,18,19,20
+HS_HTAB        dfb   $00
+               ds    10,28
 
 TITLEPAGE
          jsr   DRAW_BUCKET ;6
-DO_TITLE
          jsr   DITHERNAME ;6 
-         ldy   #$ff       ;2  Wait awhile for 'start'  before redisplaying title
+         ldy   #$ff       ;2  Wait awhile for 'start' before redisplaying title
 :wait    ldx   #$ff       ;2
 CHECK_SPACE
          lda   KBD        ;4
@@ -489,7 +513,7 @@ BEGINGAME
          jsr   PLAYAGAME  ;6
          jsr   DRAW_BUCKET  ;6 
          jsr   CHECK_HS   ;6
-         jmp   DO_TITLE   ;3
+         jmp   TITLEPAGE   ;3
 
          put   SPLASH.S
 
@@ -503,6 +527,18 @@ DITHERNAME
          lda   #5
          sta   gr_ypos
          jsr   DrawDither
+         rts
+
+FASTNAME
+         lda   #>IMG_PAINT
+         sta   gr_addr_hi
+         lda   #<IMG_PAINT
+         sta   gr_addr_lo
+         lda   #5
+         sta   gr_xpos
+         lda   #5
+         sta   gr_ypos
+         jsr   DrawBlock
          rts
 
 DRAW_BUCKET
@@ -1370,7 +1406,7 @@ TXT_GAMEOVER
          asc   "Game Over"
 
 NEXT_BOARD
-         jsr   L87A1      ;6
+         jsr   DRAIN_FILL      ;6
          ldy   BOARD_NUMBER ;4
          cpy   #$03       ;2  3 boards/level
          bne   :L8717     ;2+
@@ -1447,31 +1483,32 @@ DISP_NEXTBOARD_TEXT
          bne   :L8798     ;2+
          rts              ;6
 
-L87A1    lda   FILL_HIGH  ;4
-         and   #$e0       ;2
+DRAIN_FILL
+         lda   FILL_HIGH  ;4
+         and   #$f0       ; round to nearest 10
          sta   FILL_HIGH  ;4
          jsr   DISP_FILL_COUNT ;6
-:L87AC   lda   FILL_LOW   ;4
-         bne   :L87B7     ;2+
+:chkfill lda   FILL_LOW   ;4
+         bne   :decr      ;2+
          lda   FILL_HIGH  ;4
-         bne   :L87B7     ;2+
+         bne   :decr      ;2+
          rts              ;6
 
-:L87B7   sed              ;2
+:decr    sed              ;2
          lda   FILL_HIGH  ;4
          sec              ;2
-         sbc   #$20       ;3
+         sbc   #$10       ; subtract 10
          sta   FILL_HIGH  ;4
          lda   FILL_LOW   ;4
          sbc   #$00       ;3
          sta   FILL_LOW   ;4
          cld              ;2
          jsr   DISP_FILL_COUNT ;6
-         lda   #$02       ;2
-         jsr   GREMLIN_DEAD ;6
+         lda   #$01       ; increment score (1 point for 10 fill)
+         jsr   GREMLIN_DEAD 
 INLINE_PNT
-         lda   SPKR       ;4
-         jmp   :L87AC     ;3
+         lda   SPKR       
+         jmp   :chkfill     
 
 TXT_READY
          asc   "Ready?"

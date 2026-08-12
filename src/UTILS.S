@@ -35,7 +35,7 @@
 
 * 15 jmp table entries (63 bytes)
 
-         ds    1
+         ds    1          ; Align the scanline tables
 
 * NOTE: this must be at $840
 

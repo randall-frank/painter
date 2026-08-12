@@ -46,7 +46,7 @@ GR_SCALE_X  = 1
 GR_SCALE_Y  = 2
 GR_SCALE_XY = 3
 
-* TODO: move these
+* TODO: move these???
 ff_color    =  $08
 ff_xpos     =  $06
 ff_ypos     =  $07
@@ -68,20 +68,19 @@ tmp0        = $08
 tmp1        = $09
 
 * ProDOS entry point
-MLI           equ $bf00
-
+MLI            equ $bf00
 * MLI functions
-MLI_GETPREFIX equ $2b
-MLI_SETPREFIX equ $2c
-MLI_OPENFILE  equ $c8
-MLI_READFILE  equ $ca
-MLI_WRITEFILE equ $cb
-MLI_SETMARK   equ $ce
-MLI_CLOSEFILE equ $cc
+MLI_GETPREFIX  equ $2b
+MLI_SETPREFIX  equ $2c
+MLI_OPENFILE   equ $c8
+MLI_READFILE   equ $ca
+MLI_WRITEFILE  equ $cb
+MLI_SETMARK    equ $ce
+MLI_CLOSEFILE  equ $cc
 MLI_CREATEFILE equ $c0
-MLI_BYE       equ $65
+MLI_BYE        equ $65
 
-* Soft switches
+* Soft switches and i/o ports
 KBD         equ   $c000      ;R last key pressed + 128
 KBDSTRB     equ   $c010      ;RW keyboard strobe
 SPKR        equ   $c030      ;RW toggle speaker
