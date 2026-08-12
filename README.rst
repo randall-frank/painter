@@ -14,9 +14,12 @@ Painter
 .. |Apple2TS| image:: https://img.shields.io/badge/apple2ts-blue.svg?logo=data:image/svg%2bxml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjxzdmcgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgMjQuNSAyOC45Ij4NCiAgPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDMwLjAuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDIuMS4xIEJ1aWxkIDEyMykgIC0tPg0KICA8ZGVmcz4NCiAgICA8c3R5bGU+DQogICAgICAuc3QwIHsNCiAgICAgICAgZmlsbDogI2U0MzgzOTsNCiAgICAgIH0NCg0KICAgICAgLnN0MSB7DQogICAgICAgIGZpbGw6ICMwMDlkZTA7DQogICAgICB9DQoNCiAgICAgIC5zdDIgew0KICAgICAgICBmaWxsOiAjZjg4MjAxOw0KICAgICAgfQ0KDQogICAgICAuc3QzIHsNCiAgICAgICAgZmlsbDogI2ZmMDsNCiAgICAgIH0NCg0KICAgICAgLnN0NCB7DQogICAgICAgIGZpbGw6ICNlMjM4Mzg7DQogICAgICB9DQoNCiAgICAgIC5zdDUgew0KICAgICAgICBmaWxsOiAjZTEzNzM4Ow0KICAgICAgfQ0KDQogICAgICAuc3Q2IHsNCiAgICAgICAgZmlsbDogIzllMzk5NTsNCiAgICAgIH0NCg0KICAgICAgLnN0NyB7DQogICAgICAgIGZpbGw6ICM1ZWJmM2Y7DQogICAgICB9DQoNCiAgICAgIC5zdDggew0KICAgICAgICBmaWxsOiAjZmViYTAxOw0KICAgICAgfQ0KICAgIDwvc3R5bGU+DQogIDwvZGVmcz4NCiAgPHBhdGggY2xhc3M9InN0NyIgZD0iTTE2LjIsMGMuOS41LjcsMS40LjcsMi4ycy40LjUuOC41Yy42LDAsMS4zLDAsMS42LjZzMCwxLDAsMS41aC04LjV2LTJjLjgsMCwxLjctLjIsMi42LS40Vi43Yy4zLS4yLjUtLjQuNy0uNmgyLjFaIi8+DQogIDxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0xOS4yLDI0LjF2My4yYzAsLjcsMCwxLjItLjksMS4ycy0uMi4xLS40LjJjLS4zLjEtLjUuMi0uNy4yaC0uMWMtLjItLjItLjQtLjQtLjYtLjQtLjUsMC0uNy0uMy0uNy0uOHYtMy41aDMuNFoiLz4NCiAgPHBhdGggY2xhc3M9InN0MiIgZD0iTTE2LjcsOS43di44aDJjLjUsMCwuNy4yLjYuNnYyaDQuOWMwLC42LjEsMS4xLjEsMS43aC01Ljh2LS45aC00LjNjMCwuMiwwLC41LS4xLjhoLTZjMC0xLjgtLjItMS45LDEuNy0xLjguMiwwLC4zLDAsLjYtLjEuMS0uNS4yLTEsLjEtMS41aC0zLjdzLS4yLjEtLjMuMmgwdjEuNWMwLC42LS4zLjktLjkuOWgtMS4yYy0uNy0uMS0uOS4yLTEsLjlILjF2LTEuMWMuMi0uNy43LS44LDEuNC0uOCwxLjIsMCwxLjEsMCwxLjItMS4xLDAtLjUuMy0xLC41LTEuNSwwLS4xLjMtLjIuNS0uMmgxLjNjMCwwLC4zLS4yLjUtLjRoMTEuMloiLz4NCiAgPHBhdGggY2xhc3M9InN0NiIgZD0iTTE2LjcsMTkuNWMwLC44LjMsMS4xLDEsMWguN2MuNiwwLC44LjMuOC44djNoLTMuM2MtLjQsMC0uOC0uMS0xLjMtLjItMS4xLDAtMS4zLS4yLTEuMy0xLjJzLS42LTEuNS0xLjgtMS40djIuNGMtLjgsMC0xLjUuMi0yLjMuMkgxLjljLTEuNCwwLTIuNC0xLjUtMS43LTIuOCwwLS4yLjItLjMuNS0uNC4zLDAsLjMsMCwuMywwaDYuNnMuMi0uMi4zLS4zYzAtLjMuMS0uNi4zLTFoOC42LDBaIi8+DQogIDxwYXRoIGNsYXNzPSJzdDgiIGQ9Ik0xNi43LDkuN0g1LjZjMC0uNiwwLTEuMS40LTEuN2g0LjJjLjUsMCwuNi0uMi42LS43di0yLjVoOC41djMuM2MwLC42LS4yLjgtLjguOGgtMS45di45aDBaIi8+DQogIDxwYXRoIGNsYXNzPSJzdDQiIGQ9Ik04LjIsMTQuNmg2YzAsLjguMSwxLjcsMCwyLjUsMCwuNy4yLjkuOS44aC41YzEsMCwxLjMuNiwxLjIsMS43aC04LjZ2LTVaIi8+DQogIDxwYXRoIGNsYXNzPSJzdDUiIGQ9Ik0wLDE0LjhoMy4zYzAsLjYsMCwxLjEtLjIsMS43LS45LDAtMS43LDAtMi41LS4xcS0uMi0uMS0uMy0uM2MwLS4yLDAsMCwwLDAsMC0uNC0uMi0uNy0uMy0xLjF2LS4yWiIvPg0KICA8cGF0aCBjbGFzcz0ic3QzIiBkPSJNMTAuMSw4aC00LjFjLjQsMCwuOS0uMSwxLjQtLjFoMi43WiIvPg0KICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTguNiwxNC44aDUuOGMuMiwxLjUsMCwxLjYtMS40LDEuNmgtMy4zYy0uNywwLTEuMS0uNC0xLjEtMS4xczAtLjMsMC0uNVoiLz4NCjwvc3ZnPg==
       :target: https://apple2ts.com/?appmode=game&theme=dark#https://github.com/randall-frank/spaceparanoia/releases/download/v1.0.0/SpacePara_Release.po
 
-.. image:: banner.png
-   :alt: Splash screen banner
-   :align: center
+
+.. raw:: html
+
+   <p align="center">
+     <img src="banner.png" style="width:600px; height:auto;">
+   </p>
 
 
 Overview
@@ -35,9 +38,12 @@ and replaced the HRCG with a simpler text drawing routine.
 
 The result is what you see here: Painter, for ProDOS.
 
-.. image:: splash.png
-   :alt: Splash screen banner
-   :align: center
+.. raw:: html
+
+   <p align="center">
+     <img src="splash.png" style="width:600px; height:auto;">
+   </p>
+
 
 Details
 -------
@@ -74,10 +80,11 @@ Start a game by pressing the spacebar when the "Painter" logo is fully visible.
 
 Gameplay looks like this:
 
-.. image:: gameplay.png
-   :alt: Splash screen banner
-   :align: center
+.. raw:: html
 
+   <p align="center">
+     <img src="gameplay.png" style="width:600px; height:auto;">
+   </p>
 
 Use the joystick to move the cursor around the screen while the 'bugs' move about
 in a random fashion.  The goal is to paint over all of the bugs to get to the
