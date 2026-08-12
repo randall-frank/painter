@@ -112,7 +112,9 @@ which provides a simpler download option and forum to discuss more gameplay rela
 
 Things To Do
 ~~~~~~~~~~~~
-TBD
+ * Colorize double size text
+ * Add additional songs
+ * Better joystick control, better than diagonals
 
 License
 -------

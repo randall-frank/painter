@@ -17,6 +17,11 @@ KEY_BANG        equ   $a1
 
 FF_STACK_SIZE   equ   $d8   
 
+STR_SPACE       equ   0
+STR_INITIALS    equ   1
+STR_CLEAR       equ   2
+
+
 TMP0            equ   $00
 TMP1            equ   $01
 CROSS_X         equ   $02
@@ -130,6 +135,42 @@ TXT_COPY
          asc   "Copyright ", $13, " 1984 Randy Frank (", $00
 
          put   VERSION.S
+
+DRAW_INFO
+         asl
+         tay
+         lda   STRTABLE,Y
+         sta   sfetch+1
+         iny
+         lda   STRTABLE,Y
+         sta   sfetch+2
+         lda   #22
+         sta   MON_CV  
+         jsr   MON_VTAB 
+         lda   #0
+         sta   MON_CH
+         ldy   #0
+sfetch   lda   TXT_SPACE
+         beq   :out
+         jsr   MON_COUT
+         inc   sfetch+1
+         bne   sfetch
+         inc   sfetch+2
+         bne   sfetch
+:out     rts
+
+STRTABLE 
+         da    TXT_SPACE
+         da    TXT_INITALS
+         da    TXT_CLEAR
+
+TXT_SPACE
+         asc   " Space: Play, ^S: Sound toggle, ^B: Bye", $00
+TXT_INITALS
+         asc   "Highscore! Type initials & press Return", $00         
+TXT_CLEAR
+         asc   "                                       ", $00
+
 
 GrScanline
          sty   GR_PTMP
@@ -282,6 +323,8 @@ STILL_MOVING
          lda   MIXCLR
          jsr   DRAW_BUCKET 
          jsr   FASTNAME
+         lda   #STR_INITIALS
+         jsr   DRAW_INFO
          lda   WHICH_SCORE ;4
          asl   A          ;2
          asl   A          ;2
@@ -490,6 +533,8 @@ HS_HTAB        dfb   $00
 
 TITLEPAGE
          jsr   DRAW_BUCKET ;6
+         lda   #STR_SPACE
+         jsr   DRAW_INFO
          jsr   DITHERNAME ;6 
          ldy   #$ff       ;2  Wait awhile for 'start' before redisplaying title
 :wait    ldx   #$ff       ;2

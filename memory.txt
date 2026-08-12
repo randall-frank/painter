@@ -4,24 +4,17 @@
           - text drawing, scanline tables, font
 
 2000-3fff - HGR
-4000-5fff - Splash screen - PAINT_SPLASH.HGR
-6000-60ff - high scores -
-6100-xxxx - game code
+4000-40ff - high scores
+4100-xxxx - game code
 
 
 PAINTER.SYSTEM
 
 2000-2100 - relocate code
 2800-3fff - UTILS.S code to be relocated to 0800
-4000-5fff - Splash screen - PAINT_SPLASH.HGR
-6000-60ff - high scores -
-6100-xxxx - game code
+4000-40ff - high scores
+4100-xxxx - game code
 
-TODO:
-    Colorize text
-    Button info: more text prompts
-    Add other music
-    Better joystick control
 
 https://hgrtool.art/imgedit.html
 
@@ -66,4 +59,3 @@ $33 (51)  = C5
 $2F (47)  = D5
 
 $2A (42)  = E5
-
