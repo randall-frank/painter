@@ -3,8 +3,7 @@
 * and ScanlineTblLO,y form the 16bit address of 
 * the first byte in each scan line for
 * HGR1 ($2000)
-
-
+        
 ScanlineTblHI   
         dfb   $20             ;192 bytes
         dfb   $24

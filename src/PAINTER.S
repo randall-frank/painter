@@ -29,6 +29,10 @@ MON_COLOR       equ   $30        ;lo-res graphics color
 HGR_PAGE        equ   $e6
 
 
+* From UTILS.S
+ScanlineTblHI   equ   $840
+ScanlineTblLO   equ   $900
+
          org   $4000
 
 * 8 bytes/highscore, 10 highscores
@@ -126,6 +130,29 @@ TXT_COPY
          asc   "Copyright ", $13, " 1984 Randy Frank (", $00
 
          put   VERSION.S
+
+GrScanline
+         sty   GR_PTMP
+         sta   gr_LastYPos
+         tay
+         lda   ScanlineTblHI,Y
+         sta   HI
+         lda   ScanlineTblLO,Y
+         sta   LO
+         ldy   GR_PTMP
+         rts
+
+GrNextScanline
+         sty   GR_PTMP
+         inc   gr_LastYPos
+         ldy   gr_LastYPos
+         lda   ScanlineTblHI,Y
+         sta   HI
+         lda   ScanlineTblLO,Y
+         sta   LO
+         ldy   GR_PTMP
+         rts
+
 
 MON_COUTX
          sta   gr_idx
@@ -297,10 +324,10 @@ STILL_MOVING
 INITIALS
          lda   HS_NUMBER  ;4
          clc              ;2
-         adc   INITIALS_HPOS    
+         adc   INITIALS_HPOS
          sta   MON_CH     ;3
 :key_loop 
-         bit   KBD        ;4
+         bit   KBD        ;4  TODO: blinking cursor (MON_CH, (TMP+HS_NUMBER+3),
          bpl   :key_loop  ;2+
          lda   KBD        ;4  Enter initials
 
@@ -325,6 +352,11 @@ INITIALS
 
 :done    jsr   SaveHiscores
          rts              ;6
+
+CUR_HPOS dfb   0
+CUR_CHAR dfb   0
+CUR_CNT  dfb   0
+
 
 DISP_HISCORES
          jsr   HIGHSCORE_BOX
@@ -515,15 +547,15 @@ SOUNDKEY cmp   #KEY_CTRL_S
     
 READ_JOYSTICK
          ldx   #$00       ;2
-         stx   JOY_X      ;4
-         stx   JOY_Y      ;4
+         stx   JOY_X_LCL      ;4
+         stx   JOY_Y_LCL      ;4
          lda   PTRIG      ;4
 :L800B   lda   PADDL0     ;4
          bpl   :L801F     ;2+
-         stx   JOY_X      ;4
+         stx   JOY_X_LCL      ;4
 :L8013   lda   PADDL1     ;4
          bpl   :L8021     ;2+
-         stx   JOY_Y      ;4
+         stx   JOY_Y_LCL      ;4
 :L801B   inx              ;2
          bne   :L800B     ;2+
          rts              ;6
@@ -532,14 +564,14 @@ READ_JOYSTICK
 
 :L8021   bpl   :L801B     ;3
 
-JOY_X    dfb   $00
-JOY_Y    dfb   $00
+JOY_X_LCL    dfb   $00
+JOY_Y_LCL    dfb   $00
 
 UPDATE_FRAME
-         jsr   READ_JOYSTICK ;6
-         jsr   ERASE_CROSS ;6
-         jsr   DRAW_ALL_GREMLINS ;6
-         jsr   L819A      ;6
+         jsr   READ_JOYSTICK 
+         jsr   ERASE_CROSS 
+         jsr   DRAW_ALL_GREMLINS 
+         jsr   CHECK_BTNS      
          ldy   #$04       ;2
 :L8033   lda   GREMLIN_LIVE,y ;4+ Check collision with gremlins
          beq   :L8062     ;2+
@@ -575,48 +607,48 @@ UPDATE_FRAME
          ora   FRAME_STATE ;4
          sta   FRAME_STATE ;4
 MOVE_CROSS
-         lda   JOY_Y      ;4
+         lda   JOY_Y_LCL      ;4
          cmp   #$14       ;2
          bcs   :L8086     ;2+
          lda   #$00       ;2
-         sta   JOY_Y      ;4
+         sta   JOY_Y_LCL      ;4
          jmp   :L8097     ;3
 
 :L8086   cmp   #$50       ;2
          bcs   :L8092     ;2+
          lda   #$01       ;2
-         sta   JOY_Y      ;4
+         sta   JOY_Y_LCL      ;4
          jmp   :L8097     ;3
 
 :L8092   lda   #$02       ;2
-         sta   JOY_Y      ;4
-:L8097   lda   JOY_X      ;4
+         sta   JOY_Y_LCL      ;4
+:L8097   lda   JOY_X_LCL      ;4
          cmp   #$14       ;2
          bcs   :L80A6     ;2+
          lda   #$00       ;2
-         sta   JOY_X      ;4
+         sta   JOY_X_LCL      ;4
          jmp   :L80B7     ;3
 
 :L80A6   cmp   #$50       ;2
          bcs   :L80B2     ;2+
          lda   #$01       ;2
-         sta   JOY_X      ;4
+         sta   JOY_X_LCL      ;4
          jmp   :L80B7     ;3
 
 :L80B2   lda   #$02       ;2
-         sta   JOY_X      ;4
+         sta   JOY_X_LCL      ;4
 :L80B7   ldy   #$00       ;2
-:L80B9   ldx   JOY_X      ;4
+:L80B9   ldx   JOY_X_LCL      ;4
          beq   :L80C7     ;2+
          iny              ;2
          iny              ;2
          iny              ;2
-         dec   JOY_X      ;6
+         dec   JOY_X_LCL      ;6
          jmp   :L80B9     ;3
 
 :L80C7   tya              ;2
          clc              ;2
-         adc   JOY_Y      ;4
+         adc   JOY_Y_LCL      ;4
          tax              ;2
          lda   DELTA_X,x  ;4+
          clc              ;2
@@ -684,11 +716,11 @@ DRAW_CROSS
          ldx   #$00       ;2
          lda   #$09       ;2
          sta   UTILITY_INDEX ;4
-:L813A   ldy   CROSS_INDEX ;4
+:loop    ldy   CROSS_INDEX ;4
          jsr   CROSS_SCANLINE ;6
          jsr   GrNextScanline ;6
          dec   UTILITY_INDEX ;6
-         bne   :L813A     ;2+
+         bne   :loop     ;2+
          rts              ;6
 
 CROSS_SCANLINE
@@ -738,10 +770,11 @@ UTILITY_INDEX
 LINE_COUNT
          dfb   $00
 
-L819A    lda   BUTN1      ;4
+CHECK_BTNS    
+         lda   BUTN1      ;4
          asl   A          ;2
-         bcc   L81F4      ;2+
-         lda   CROSS_X    ;3
+         bcc   CHECK_BTN0
+         lda   CROSS_X    ; Start flood fill
          sta   ff_xpos    ;4
          inc   ff_xpos    ;6
          inc   ff_xpos    ;6
@@ -765,12 +798,12 @@ L819A    lda   BUTN1      ;4
          jsr   FLOODFILL  ;6  
          lda   TMP0       ;3
          cmp   FILL_LOW   ;4
-         bcc   :L81D4     ;2+
+         bcc   :fill_ok   ;2+
          bne   OUT_OF_FILL ;2+
          lda   TMP1       ;3
          cmp   FILL_HIGH  ;4
          bcs   OUT_OF_FILL ;2+
-:L81D4   lda   FILL_HIGH  ;4
+:fill_ok lda   FILL_HIGH  ;4
          sed              ;2
          sec              ;2
          sbc   TMP1       ;4
@@ -793,9 +826,10 @@ OUT_OF_FILL
          sta   FRAME_STATE ;4
          rts              ;6
 
-L81F4    lda   BUTN0      ;4
+CHECK_BTN0    
+         lda   BUTN0      ;4
          asl   A          ;2
-         bcs   PLOT_POINT ;2+
+         bcs   PLOT_POINT ; Draw a white point at the cross
          rts              ;6
 
 PLOT_POINT

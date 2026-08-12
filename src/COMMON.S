@@ -13,16 +13,14 @@ PlaySnd        = $81e
 ReadFile       = $821
 WriteFile      = $824
 Bye            = $827
-GrScanline     = $82a
-GrNextScanline = $82d
-DrawCharX      = $830
+DrawCharX      = $82a
 
 LO          = $26
 HI          = $27
 
 * SCANLINE_TBL.S
 
-* ScanlineTblHI = ~$800
+* ScanlineTblHI = $840
 * ScanlineTblLO = $900
 
 * XPOS_TABLES.S
@@ -42,6 +40,7 @@ gr_width    = $fe
 gr_height   = $ff
 gr_LastYPos = $eb
 gr_scaling  = $ed
+GR_PTMP     = $ec
 
 GR_SCALE_X  = 1
 GR_SCALE_Y  = 2
@@ -56,19 +55,17 @@ ff_dir1     =  $fe
 ff_stack    =  $fd
 
 * I/O reuses the gr_ interface
-io_src_addr_hi = $f9
+io_src_addr_hi  = $f9
 io_src_count_hi = $fa
-io_tgt_addr_hi = $fb
+io_tgt_addr_hi  = $fb
 
 * Joystick state (0,1,2) "low","center","high"
 * call JoyUpdate to update the values
-joy_x       = $06
-joy_y       = $07
+joy_x       = $ee
+joy_y       = $ef
 
 tmp0        = $08
 tmp1        = $09
-
-* Available ZP locations: $ed - $ef
 
 * ProDOS entry point
 MLI           equ $bf00

@@ -6,7 +6,6 @@
          cyc
          put   COMMON.S
 
-GR_PTMP  =   $EC
 
 * The first table is the scanline table which is 192 bytes
 * thus there is enough space for a 21 entry jmp table before
@@ -26,9 +25,19 @@ GR_PTMP  =   $EC
          jmp   ReadFile_lcl
          jmp   WriteFile_lcl
          jmp   Bye_lcl
-         jmp   GrScanline_lcl
-         jmp   GrNextScanline_lcl
          jmp   DrawCharX_lcl
+         jmp   $0000      ; unused but reserved
+         jmp   $0000
+         jmp   $0000
+         jmp   $0000
+         jmp   $0000
+         jmp   $0000
+
+* 15 jmp table entries (63 bytes)
+
+         ds    1
+
+* NOTE: this must be at $840
 
          put   SCANLINE_TBL.S   ; 192*2 bytes
 
@@ -61,28 +70,6 @@ Initialize_lcl
          lda   #0
          sta   gr_scaling
          jmp   RandInit_lcl
-
-GrScanline_lcl
-         sty   GR_PTMP
-         sta   gr_LastYPos
-         tay
-         lda   ScanlineTblHI,Y
-         sta   HI
-         lda   ScanlineTblLO,Y
-         sta   LO
-         ldy   GR_PTMP
-         rts
-
-GrNextScanline_lcl
-         sty   GR_PTMP
-         inc   gr_LastYPos
-         ldy   gr_LastYPos
-         lda   ScanlineTblHI,Y
-         sta   HI
-         lda   ScanlineTblLO,Y
-         sta   LO
-         ldy   GR_PTMP
-         rts
 
 tmp_x    = tmp0
 tmp_cnt  = tmp1
