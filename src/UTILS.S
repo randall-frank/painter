@@ -19,7 +19,7 @@
          jmp   DrawPoint_lcl
          jmp   DrawRect_lcl
          jmp   DrawBlock_lcl
-         jmp   DrawDither_lcl
+         jmp   $0000
          jmp   DrawHLine_lcl
          jmp   PlaySnd_lcl
          jmp   ReadFile_lcl
@@ -142,12 +142,25 @@ sta_text sta   $ffff,y
          rts
 
 * gr_scaling: GR_SCALE_X, GR_SCALE_Y
-
-gr_line_count dfb 0
-gr_y_loop dfb  0
+gr_line_count dfb  0
+gr_y_loop     dfb  0
+gr_color_off  dfb  0
+gr_color_or   dfb  0
 
 DrawCharX_lcl
-         lda   #>FontBase   ; set up the fetch address
+         lda   gr_scaling
+         lsr              ; we want high nibble*4 (/16 *4 = /4)
+         lsr
+         sta   gr_color_off
+         tax
+         lda   colors,X
+         and   #$80
+         sta   gr_color_or
+         lda   gr_xpos
+         and   #1
+         beq   :even
+         inc   gr_color_off ; for odd column, add 1 to color offset
+:even    lda   #>FontBase   ; set up the fetch address
          lsr
          lsr
          sta   ft2_text+2
@@ -186,16 +199,28 @@ ft2_text ldx   FontBase   ; data fetch (self modifying code)
          beq   :normalx
 
          lda   wide_byte_lo,X ; wide byte plotting
+         stx   GR_PTMP
+         ldx   gr_color_off
+         and   colors,x
+         ora   gr_color_or
          sta   (LO),y
          iny
+         ldx   GR_PTMP
          lda   wide_byte_hi,X
-         jmp   :laststa
+         ldx   gr_color_off
+         inx
+         and   colors,x
+         ora   gr_color_or
+         sta   (LO),y
+         jmp   :next
 
-:normalx txa
+:normalx txa              ; narrow plotting
+         ldx   gr_color_off
+         and   colors,x
+         ora   gr_color_or
+         sta   (LO),y
 
-:laststa sta   (LO),y
-
-         inc   gr_idx
+:next    inc   gr_idx
          dec   gr_y_loop
          bne   :yloop      ; scanline duplication
 
@@ -209,7 +234,8 @@ ft2_text ldx   FontBase   ; data fetch (self modifying code)
 * and gr_height lines tall
 DrawRect_lcl
          lda   gr_idx
-         asl            ; multi color by 2
+         asl            ; multi color by 4
+         asl
          tax              
          lda   gr_xpos  ; if gr_xpos is odd, add one to x
          and   #1
@@ -236,14 +262,14 @@ DrawRect_lcl
          bne   DrawRect_lcl
          rts
 
-colors   hex   0000
-         hex   7f7f
-         hex   552A
-         hex   2A55
-         hex   8080
-         hex   ffff
-         hex   D5AA
-         hex   AAD5
+colors   hex   00000000
+         hex   7f7f7f7f
+         hex   552A552A
+         hex   2A552A55
+         hex   80808080
+         hex   ffffffff
+         hex   D5AAD5AA
+         hex   AAD5AAD5
 
 * 1248124  1248124
 * 1010101  0101010  55 2A  D5 AA  
@@ -286,61 +312,6 @@ BlockFetch
          bne   :skip
          inc   BlockFetch+2
 :skip    rts
-
-dither_idx dfb 0
-dither_y dfb   0
-dither_table              ; a = list(range(32)) random.shuffle(a)
-         hex 031a1c1d09131906001f1e101201040e1b080711020c0d17140b050a1618150f
-
-* Same as DrawBlock, except that the image is drawn in 32
-* passes with only 1/64 of the image drawn each time.
-DrawDither_lcl
-         lda   #$1f
-         sta   dither_idx
-         lda   gr_ypos
-         sta   dither_y
-:nextd   lda   gr_addr_hi
-         sta   BlockFetch+2
-         lda   gr_addr_lo
-         sta   BlockFetch+1
-         jsr   BlockFetch ; first byte is the block width
-         sta   gr_width
-         jsr   BlockFetch ; second byte is the block height
-         sta   gr_height
-         lda   dither_y   ; restart at the top again
-         sta   gr_ypos
-:line    ldy   gr_ypos    ; start scanline
-         lda   ScanlineTblHI,y
-         sta   HI
-         lda   ScanlineTblLO,y
-         sta   LO
-         lda   gr_width
-         sta   tmp_cnt
-         ldy   gr_xpos
-:byte    jsr   BlockFetch
-         pha
-         ; if the low order src addr matches the table
-         ; then draw, otherwise, later pass
-         ldx   dither_idx   
-         lda   BlockFetch+1
-         eor   tmp_cnt
-         and   #$1f       ; only 64 char table
-         cmp   dither_table,x
-         bne   :nodraw
-         pla
-         sta   (LO),y
-         sec
-         bcs   :cont
-:nodraw  pla         
-:cont    iny
-         dec   tmp_cnt
-         bne   :byte
-         inc   gr_ypos
-         dec   gr_height
-         bne   :line
-         dec   dither_idx ; next dither pass
-         bpl   :nextd
-         rts
 
 * EOR a "dot" at gr_xpos (pixels), gr_ypos
 DrawPoint_lcl

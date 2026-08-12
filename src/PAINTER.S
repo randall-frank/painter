@@ -62,7 +62,7 @@ GAME_SETUP
          jsr   HGR_CLEAR  
          lda   MIXCLR     
          jsr   LoadHiscores  
-         jmp   TITLEPAGE  
+         jmp   TITLEPAGE
 
 * Utility function to generate a "massdraw" format image
 
@@ -197,13 +197,13 @@ GrNextScanline
 
 MON_COUTX
          sta   gr_idx
-         lda   #GR_SCALE_X
+         lda   #GR_SCALE_X+GR_COLOR_C
          sta   gr_scaling
          jmp   :DrawCharX
 
 MON_COUTXY
          sta   gr_idx
-         lda   #GR_SCALE_XY
+         lda   #GR_SCALE_XY+GR_COLOR_R
          sta   gr_scaling
 :DrawCharX         
          lda   MON_CH     ; HPOS
@@ -319,9 +319,7 @@ STILL_MOVING
          dec   INSERT_POINT ;6
          jmp   STILL_MOVING ;3
 
-:newhigh jsr   HGR_CLEAR
-         lda   MIXCLR
-         jsr   DRAW_BUCKET 
+:newhigh jsr   DRAW_BUCKET 
          jsr   FASTNAME
          lda   #STR_INITIALS
          jsr   DRAW_INFO
@@ -536,7 +534,7 @@ TITLEPAGE
          lda   #STR_SPACE
          jsr   DRAW_INFO
          jsr   DITHERNAME ;6 
-         ldy   #$ff       ;2  Wait awhile for 'start' before redisplaying title
+         ldy   #$80       ;2  Wait awhile for 'start' before redisplaying title
 :wait    ldx   #$ff       ;2
 CHECK_SPACE
          lda   KBD        ;4
@@ -556,6 +554,8 @@ CHECK_SPACE
 
 BEGINGAME
          jsr   PLAYAGAME  ;6
+         jsr   HGR_CLEAR
+         lda   MIXCLR
          jsr   DRAW_BUCKET  ;6 
          jsr   CHECK_HS   ;6
          jmp   TITLEPAGE   ;3
@@ -2332,3 +2332,69 @@ FF_STACK_X
 FF_STACK_Y
          ds    FF_STACK_SIZE 
 
+
+dither_idx   dfb  0
+dither_y     dfb  0
+dither_table              ; a = list(range(32)) random.shuffle(a)
+         hex 031a1c1d09131906001f1e101201040e1b080711020c0d17140b050a1618150f
+
+* Same as DrawBlock, except that the image is drawn in 32
+* passes with only 1/64 of the image drawn each time.
+DrawDither
+         lda   #$1f
+         sta   dither_idx
+         lda   gr_ypos
+         sta   dither_y
+:nextd   lda   gr_addr_hi
+         sta   BlockFetch+2
+         lda   gr_addr_lo
+         sta   BlockFetch+1
+         jsr   BlockFetch ; first byte is the block width
+         sta   gr_width
+         jsr   BlockFetch ; second byte is the block height
+         sta   gr_height
+         lda   dither_y   ; restart at the top again
+         sta   gr_ypos
+         lda   KBD
+         cmp   #KEY_SPACE
+         bne   :line
+         rts
+:line    ldy   gr_ypos    ; start scanline
+         lda   ScanlineTblHI,y
+         sta   HI
+         lda   ScanlineTblLO,y
+         sta   LO
+         lda   gr_width
+         sta   tmp1
+         ldy   gr_xpos
+:byte    jsr   BlockFetch
+         pha
+         ; if the low order src addr matches the table
+         ; then draw, otherwise, later pass
+         ldx   dither_idx   
+         lda   BlockFetch+1
+         eor   tmp1
+         and   #$1f       ; only 64 char table
+         cmp   dither_table,x
+         bne   :nodraw
+         pla
+         sta   (LO),y
+         sec
+         bcs   :cont
+:nodraw  pla         
+:cont    iny
+         dec   tmp1
+         bne   :byte
+         inc   gr_ypos
+         dec   gr_height
+         bne   :line
+         dec   dither_idx ; next dither pass
+         bpl   :nextd
+         rts
+
+BlockFetch
+         lda   $ffff
+         inc   BlockFetch+1
+         bne   :skip
+         inc   BlockFetch+2
+:skip    rts

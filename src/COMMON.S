@@ -7,7 +7,7 @@ DrawStr        = $80c
 DrawPoint      = $80f
 DrawRect       = $812
 DrawBlock      = $815
-DrawDither     = $818
+Unused0        = $818
 DrawHLine      = $81b
 PlaySnd        = $81e
 ReadFile       = $821
@@ -45,6 +45,12 @@ GR_PTMP     = $ec
 GR_SCALE_X  = 1
 GR_SCALE_Y  = 2
 GR_SCALE_XY = 3
+
+GR_COLOR_W  = $10
+GR_COLOR_P  = $20
+GR_COLOR_G  = $30
+GR_COLOR_C  = $60
+GR_COLOR_R  = $70
 
 * TODO: move these???
 ff_color    =  $08
