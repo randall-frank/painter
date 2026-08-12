@@ -499,14 +499,17 @@ DRAW_BUCKET
          rts
 
 KEYCHECK 
-         lda   KBD        ;4
-SOUNDKEY cmp   #KEY_CTRL_S ;2
-         bne   :L7F3D     ;2+
-         lda   INLINE_CLICK+1 ;4
-         eor   #$30       ;2
-         sta   INLINE_CLICK+1 ;4
-         lda   KBDSTRB    ;4
-:L7F3D   rts              ;6
+         lda   KBD        
+SOUNDKEY cmp   #KEY_CTRL_S 
+         bne   :L7F3D     
+         lda   INLINE_CLK+1 
+         eor   #$30       
+         sta   INLINE_CLK+1
+         sta   INLINE_EXP+1
+         sta   INLINE_FF+1
+         sta   INLINE_PNT+1
+         lda   KBDSTRB    
+:L7F3D   rts              
 
          DS \
     
@@ -1270,7 +1273,7 @@ SOUND_FETCH
 SHORT_DELAY
          dey             
          bne   SHORT_DELAY ; Tonal delay
-INLINE_CLICK
+INLINE_CLK
          lda   SPKR       
          dex              
          bne   SOUND_FETCH 
@@ -1432,6 +1435,7 @@ L87A1    lda   FILL_HIGH  ;4
          jsr   DISP_FILL_COUNT ;6
          lda   #$02       ;2
          jsr   GREMLIN_DEAD ;6
+INLINE_PNT
          lda   SPKR       ;4
          jmp   :L87AC     ;3
 
@@ -1500,6 +1504,7 @@ EXPLODE  inc   CROSS_X    ;5
 :L888F   ldy   PTRIG      ;4
 :L8892   dey              ;2
          bne   :L8892     ;2+
+INLINE_EXP
          lda   SPKR       ;4
          dex              ;2
          bne   :L888F     ;2+
@@ -1629,7 +1634,6 @@ DISP_NO_FILL
 TXT_OUTOFFILL
          asc   "Out of Paint"
 
-         ds    \
 SOUND_TABLE
          hex   6464646464016464
          hex   6464640164646464
@@ -1929,6 +1933,7 @@ FF_MOVE_POINT
          lda   TMP0       ;3
          adc   #$00       ;3
          sta   TMP0       ;3
+INLINE_FF
          ldy   SPKR       ;4
          cld              ;2
          cmp   #$40       ;2
