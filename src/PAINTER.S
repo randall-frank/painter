@@ -1262,27 +1262,36 @@ PAUSE_LOOP
          bne   :not_bye
          jmp   Bye
 :not_bye 
-         ldx   SOUND_LENGTH ;4  Number of loops for sound
-NEXT_SOUND_COUNT
-         ldy   SOUND_LOW  ;4  Get the delay for the current sound index
+
+
+         ldx   SOUND_LENGTH ;4  Number of loops for sound (board parameter)
 SOUND_FETCH
-         lda   SOUND_TABLE,y ;4+ Starts at $8a00 and runs to $8cff
-         tay              ;2
+         ldy   SOUND_TABLE ; Self modifying code
 SHORT_DELAY
-         dey              ;2
-         bne   SHORT_DELAY ;2+ Tonal delay
+         dey             
+         bne   SHORT_DELAY ; Tonal delay
 INLINE_CLICK
-         lda   SPKR       ;4
-         dex              ;2
-         bne   NEXT_SOUND_COUNT ;2+
-         inc   SOUND_LOW  ;6
-         bne   PING_DONE  ;2+
-         ldy   SOUND_FETCH+2 ;4  Bump sound fetch hi byte
-         iny              ;2
-         cpy   #>SOUND_TABLE_END ;2
-         bne   :L86B3     ;2+
-         ldy   #>SOUND_TABLE ;2
-:L86B3   sty   SOUND_FETCH+2 ;4
+         lda   SPKR       
+         dex              
+         bne   SOUND_FETCH 
+         
+         inc   SOUND_FETCH+1 ; increment the fetch
+         bne   END_CHECK
+         inc   SOUND_FETCH+2
+
+END_CHECK
+         lda   SOUND_FETCH+1 ; end of table check
+         cmp   #<SOUND_TABLE_END
+         bne   PING_DONE
+         lda   SOUND_FETCH+2
+         cmp   #>SOUND_TABLE_END
+         bne   PING_DONE
+
+         lda   #>SOUND_TABLE ;loop the sound table
+         sta   SOUND_FETCH+2 
+         lda   #<SOUND_TABLE 
+         sta   SOUND_FETCH+1 
+
 PING_DONE
          nop              ;2
          lda   FRAME_STATE ;4
@@ -1447,8 +1456,6 @@ LEVEL_LIVE_GREMLIN_TABLE
 SOUND_LENGTH
          dfb   $00
 GENERIC_INDEX
-         dfb   $00
-SOUND_LOW
          dfb   $00
 
 EXPLODE  inc   CROSS_X    ;5
