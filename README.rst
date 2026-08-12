@@ -122,6 +122,7 @@ Things To Do
  * Add additional songs
  * Better joystick control, better than diagonals
  * Speed improvements/balance
+ * Rework cursor hit detection
 
 License
 -------
