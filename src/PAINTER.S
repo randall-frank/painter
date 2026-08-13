@@ -59,7 +59,7 @@ HIGHSCORES
 
 GAME_SETUP
          jsr   Initialize
-         jsr   HGR_CLEAR  
+         jsr   HGR  
          lda   MIXCLR     
          jsr   LoadHiscores  
          jmp   TITLEPAGE
@@ -586,6 +586,20 @@ FASTNAME
          jsr   DrawBlock
          rts
 
+HGR_CLEAR
+         lda   #0
+         sta   gr_idx
+         lda   #0
+         sta   gr_ypos
+         lda   #0
+         sta   gr_xpos
+         lda   #40
+         sta   gr_width
+         lda   #192
+         sta   gr_height
+         jsr   DrawRect
+         rts
+
 DRAW_BUCKET
          lda   #0
          sta   gr_idx
@@ -708,77 +722,58 @@ MOVE_CROSS
          bcs   :L80A6     ;2+
          lda   #$00       ;2
          sta   JOY_X_LCL      ;4
-         jmp   :L80B7     ;3
+         jmp   :movecr     ;3
 
 :L80A6   cmp   #$50       ;2
          bcs   :L80B2     ;2+
          lda   #$01       ;2
          sta   JOY_X_LCL      ;4
-         jmp   :L80B7     ;3
-
+         jmp   :movecr     ;3
 :L80B2   lda   #$02       ;2
          sta   JOY_X_LCL      ;4
-:L80B7   ldy   #$00       ;2
-:L80B9   ldx   JOY_X_LCL      ;4
-         beq   :L80C7     ;2+
-         iny              ;2
-         iny              ;2
-         iny              ;2
-         dec   JOY_X_LCL      ;6
-         jmp   :L80B9     ;3
 
-:L80C7   tya              ;2
-         clc              ;2
-         adc   JOY_Y_LCL      ;4
-         tax              ;2
-         lda   DELTA_X,x  ;4+
-         clc              ;2
-         adc   CROSS_X    ;3
-         sta   CROSS_X    ;3
-         lda   DELTA_Y,x  ;4+
-         clc              ;2
-         adc   CROSS_Y    ;3
-         sta   CROSS_Y    ;3
+* move cross
+:movecr  
+         ldx   JOY_X_LCL
+         lda   DDELTA,X
+         clc
+         adc   CROSS_X    
+         sta   CROSS_X    
+         ldx   JOY_Y_LCL
+         lda   DDELTA,X
+         clc
+         adc   CROSS_Y    
+         sta   CROSS_Y    
+    
+* clamp to playfield
          lda   CROSS_X    ;3
          cmp   #$00       ;2
-         bne   :L80E7     ;2+
+         bne   :xmax       ;2+
          lda   #$01       ;2
          sta   CROSS_X    ;3
-:L80E7   cmp   #$86       ;2
-         bne   :L80EF     ;2+
+:xmax    cmp   #$86       ;2
+         bne   :ymin      ;2+
          lda   #$85       ;2
          sta   CROSS_X    ;3
-:L80EF   lda   CROSS_Y    ;3
+:ymin    lda   CROSS_Y    ;3
          cmp   #$13       ;2
-         bne   :L80F9     ;2+
+         bne   :ymax       ;2+
          lda   #$14       ;2
          sta   CROSS_Y    ;3
-:L80F9   cmp   #$b5       ;2
-         bne   :L8101     ;3+
+:ymax    cmp   #$b5       ;2
+         bne   :clamped   ;3+
          lda   #$b4       ;2
          sta   CROSS_Y    ;3
-:L8101   jsr   MOVE_GREMLINS ;6
+
+:clamped jsr   MOVE_GREMLINS ;6
          jsr   DRAW_CROSS ;6
          rts              ;6
 
-DELTA_X  dfb   $ff
-         dfb   $ff
-         dfb   $ff
-         dfb   $00
-         dfb   $00
-         dfb   $00
-         dfb   $01
-         dfb   $01
-         dfb   $01
-DELTA_Y  dfb   $ff
-         dfb   $00
-         dfb   $01
-         dfb   $ff
-         dfb   $00
-         dfb   $01
-         dfb   $ff
-         dfb   $00
-         dfb   $01
+* 0=low,1=mid,2=high
+* Table is (0,0),(0,1),(0,2)
+*          (1,0),(1,1),(1,2)
+*          (2,0),(2,1),(2,2)
+DDELTA   hex   ff0001
 
 DRAW_CROSS
          lda   CROSS_X    ;3

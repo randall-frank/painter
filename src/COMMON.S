@@ -104,7 +104,7 @@ PTRIG       equ   $C070      ; Trigger (start) paddle measurement
 * monitor entry points
 MONITOR     equ   $FF69
 HGR         equ   $F3E2
-HGR_CLEAR   equ   $f3e2
+                          ; ROM_HGR_CLEAR   equ   $F3F2 
 HPLOT0      equ   $f457
 HCOLOR      equ   $f6ec
 SETHCOLOR   equ   $f6f0
