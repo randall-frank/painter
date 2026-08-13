@@ -107,7 +107,7 @@ burn a 5.25" disk with the image.  Thanks to the great work by Chris Torrence
 and Michael Morrison on the `Apple2TS <https://github.com/ct6502/apple2ts>`_ browser 
 hosted Apple II emulator, one can play the game via a web browser.  
 
-`Play Painter in a browser <https://apple2ts.com/?appmode=game&theme=dark#https://github.com/randall-frank/painter/releases/download/v1.0.0/Painter_Release.po>`_
+`Play Painter in a browser <https://apple2ts.com/?appmode=game&theme=dark#https://github.com/randall-frank/painter/releases/download/v1.0.1/Painter_Release.po>`_
 
 Please feel free to post issues and other questions at `Painter Issues
 <https://github.com/randall-frank/painter/issues>`_. This is the best place
