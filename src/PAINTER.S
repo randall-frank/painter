@@ -654,31 +654,31 @@ UPDATE_FRAME
          jsr   DRAW_ALL_GREMLINS 
          jsr   CHECK_BTNS      
          ldy   #$04       ;2
-:L8033   lda   GREMLIN_LIVE,y ;4+ Check collision with gremlins
-         beq   :L8062     ;2+
+:nextg   lda   GREMLIN_LIVE,y ;4+ Check collision with gremlins
+         beq   :miss     ;2+
          lda   GREMLIN_X,y ;4+
          clc              ;2
-         adc   #$05       ;2
+         adc   #4       ;2
          cmp   CROSS_X    ;3
-         bcc   :L8062     ;2+
+         blt   :miss     ;2+
          sec              ;2
-         sbc   #$0a       ;2
+         sbc   #9       ;2
          cmp   CROSS_X    ;3
-         bcs   :L8062     ;2+
+         bge   :miss     ;2+
          lda   GREMLIN_Y,y ;4+
          clc              ;2
-         adc   #$05       ;2
+         adc   #8       ;2
          cmp   CROSS_Y    ;3
-         bcc   :L8062     ;2+
+         blt   :miss     ;2+
          sec              ;2
-         sbc   #$0a       ;2
+         sbc   #16       ;2
          cmp   CROSS_Y    ;3
-         bcs   :L8062     ;2+
+         bge   :miss     ;2+
          lda   #FLG_COLLIDE ;2
          ora   FRAME_STATE ;4
          sta   FRAME_STATE ;4
-:L8062   dey              ;2
-         bne   :L8033     ;2+
+:miss    dey              ;2
+         bne   :nextg     ;2+
          ldy   #$04       ;2
 :L8067   lda   GREMLIN_LIVE,y ;4+
          bne   MOVE_CROSS ;2+
