@@ -24,17 +24,22 @@ Painter
 
 Overview
 --------
-Painter is more of a tech demo than a game.  In 1984 I was playing
-around with a number of Apple II graphics and sound routines.  Having
-a routine to do a flood fill is pretty boring, so I glued
-a little game around it.  The result was painter.  The flood fill
-routine is ridiculously slow, but sort of interesting to watch and
-I was playing with playing background music as well.
+Painter is more of a tech demo than a game, but it was the first `game`
+I wrote entirely in 6502.  Previous games like the 'Rage' series
+used assembly language graphics with an Applesoft driver.
 
-Written in EDASM (but I lost the source code) for DOS 3.3.  What
-you have here is a recovery of the original source in Merlin format
-using SourceGen.  I then reworked the memory layout for ProDOS
-and replaced the HRCG with a simpler text drawing routine.
+In 1984 I was playing around with a number of Apple II graphics and 
+sound routines.  Writing a flood fill is pretty boring, so I built
+a little game around it.  The result is painter.  The flood fill
+routine is ridiculously slow but sort of interesting to watch and
+I threw in some crude background music as well.  I think
+'Microwave' got me thinking about that.
+
+The game was originally written with EDASM (but I lost the source code) 
+on DOS 3.3.  The source code in this repo is a reproduction of the 
+original source in Merlin format using the SourceGen tool.  I reworked 
+the memory layout for ProDOS and replaced the HRCG with a simpler text 
+drawing routine (as the older HRCG was not ProDOS compatible).
 
 The result is what you see here: Painter, for ProDOS.
 
@@ -45,24 +50,20 @@ The result is what you see here: Painter, for ProDOS.
    </p>
 
 
-Details
--------
-The source presented here is written entirely in Merlin 6502 assembly. 
-
-
 Building
 ~~~~~~~~
 There is a build script (`build.py`) in this repo that is capable of 
-generating a .po file from the sources.  It requires several tools to be installed:
+generating a .po file from the sources.  It requires several tools:
 
 - Python
 - `Merlin32 Assembler <https://brutaldeluxe.fr/products/crossdevtools/merlin/>`_
 - `CiderPress II <https://ciderpress2.com/>`_
 
-If one places the CiderPress CLI in a subdirectory named 'ciderpress' (ciderpress/cp2.exe)
-and places the Merlin package in a subdirectory named 'merlin32' 
-(merlin32\\Windows\\Merlin32.exe), then the following commands will build
-the `Painter_Release.po` file:
+If one does not have Merlin32 or CiderPress II installed, the build script will
+download reasonable versions, placing them into `merlin` and `ciderpress` subdirectories
+of this repo.
+
+The following commands will build the `Painter_Release.po` file:
 
 .. code::
 
@@ -70,13 +71,35 @@ the `Painter_Release.po` file:
    .\venv\Scripts\activate.ps1
    python build.py
 
+   INFO:build:Attempting to pull merlin32 from: https://brutaldeluxe.fr/products/crossdevtools/merlin/Merlin32_v1.2.zip
+   INFO:build:Attempting to pull ciderpress from: https://github.com/fadden/CiderPress2/releases/download/v1.1.1/cp2_1.1.1_win-x86_sc.zip
+   INFO:build:Using Merlin32: merlin\Merlin32_v1.2_b2\Windows\merlin32.exe merlin\Merlin32_v1.2_b2\library
+   INFO:build:Using CiderPress2: ciderpress\cp2.exe
+   INFO:build:Generating 6502 source code...
+   INFO:build:Assembling 6502 source code...
+   INFO:build:Assembling: UTILS.S
+   INFO:build:Assembling: LOADER.S
+   INFO:build:Assembling: PAINTER.S
+   INFO:build:Building PAINTER.SYSTEM(SYS#ff) file...
+   INFO:build:Wrote system file: SYSTEM/PAINTER.SYSTEM#ff2000
+   INFO:build:Building .po disk image...
+   INFO:build:Created release disk image: Creating disk image: Unadorned Sector, order=pdos/blk, size=140KB, ProDOS
+   INFO:build:Renamed release disk image: renaming /NEWDISK -> PAINTER.1.0.1
+   INFO:build:System files added to disk image: Adding 4 files
+   adding SYSTEM\BASIC.SYSTEM#ff2000 -> BASIC.SYSTEM
+   adding SYSTEM\PAINTER.SYSTEM#ff2000 -> PAINTER.SYSTEM
+   adding SYSTEM\PRODOS#ff0000 -> PRODOS
+   INFO:build:System files added to disk image: deleting BASIC.SYSTEM
+   INFO:build:Build v1.0.1 complete.
 
-One can adjust the pathnames to CiderPress and Merlin at the top of the build.py file.
+One can adjust the pathnames to CiderPress and Merlin at the top of the build.py file
+if you have these programs installed and wish to use the installed versions.
 
 Documentation and Issues
 ------------------------
 
-Start a game by pressing the spacebar when the "Painter" logo is fully visible.
+Start a new game by pressing the spacebar. Ctrl-S will toggle the sound on/off and
+ctrl-B will execute a ProDOS 'BYE' command.
 
 Gameplay looks like this:
 
@@ -86,17 +109,21 @@ Gameplay looks like this:
      <img src="gameplay.png" style="width:600px; height:auto;">
    </p>
 
-Use the joystick to move the cursor around the screen while the 'bugs' move about
-in a random fashion.  The goal is to paint over all of the bugs to get to the
-next board.
 
-You can use button 0 to draw white lines around the bugs.  Button 1 begins "painting"
+The basic idea is to 'paint' over all the bugs.  Use the joystick to move the cursor 
+around the screen while the 'bugs' move about in a random fashion.  You can draw
+lines that tbe bugs cannot cross and you can pour 'paint' that fills the board up
+to the lines.  
+
+Use button 0 to draw white lines around the bugs.  Button 1 begins "painting"
 at the point of the cursor, filling the enclosed region with paint.  If bugs are in
-the paint, they will die.  
+the paint, they will die.  The goal is to paint over all of the bugs to get to the next board.
 
-You have a limited amount of paint for each board, so one should try to enclose
-the bugs in tight regions.  If the cursor collides with a bug or you run out of
-paint, you will die.  You have three lives for each game.
+You have a limited amount of paint for each board, so you should try to enclose
+the bugs in tight regions.  
+
+If the cursor collides with a bug or you run out of paint, you will die.  You have 
+three lives for each game.
 
 
 How to Play
@@ -122,7 +149,6 @@ Things To Do
  * Add additional songs
  * Better joystick control, better than diagonals
  * Speed improvements/balance
- * Rework cursor hit detection
 
 License
 -------
