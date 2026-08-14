@@ -2,13 +2,12 @@ import argparse
 import glob
 import platform
 import logging
-import shutil
 import subprocess
 import sys
 import os
 import urllib.request
 import zipfile
-
+from src import genjoytbl
 
 # Note: these paths are for local Windows installs.  All of these tools
 # can be installed under Linux as well, but these paths will need to change.
@@ -112,6 +111,9 @@ log.info("Generating 6502 source code...")
 with open(os.path.join("src","VERSION.S"), "w") as out:
     text = f"version  asc  '{version}'\n"
     out.write(text)
+    
+# Build the joystick mapping table
+genjoytbl.make_source("src/JOYTBL.S")
 
 files = ["UTILS.S", "LOADER.S", "PAINTER.S"]
 

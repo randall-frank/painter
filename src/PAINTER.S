@@ -24,8 +24,11 @@ STR_CLEAR       equ   2
 
 TMP0            equ   $00
 TMP1            equ   $01
-CROSS_X         equ   $02
+CROSS_X         equ   $02       ; some code assumes these are sequential
 CROSS_Y         equ   $03
+CROSS_X_FR      equ   $04
+CROSS_Y_FR      equ   $05
+
 MON_CH          equ   $24        ;cursor horizontal displacement
 MON_CV          equ   $25        ;cursor vertical displacement
 GR_LOW          equ   $26
@@ -638,8 +641,8 @@ SOUNDKEY cmp   #KEY_CTRL_S
          lda   KBDSTRB    
 :L7F3D   rts              
 
-         DS \
-    
+         DS \             ; page align this routine for cycle counts
+
 READ_JOYSTICK
          ldx   #$00       ;2
          stx   JOY_X_LCL      ;4
@@ -653,7 +656,10 @@ READ_JOYSTICK
          stx   JOY_Y_LCL      ;4
 :L801B   inx              ;2
          bne   :L800B     ;2+
-         rts              ;6
+         rts
+
+* View of the joystick (unsigned)
+* 0=min,~55=center,~110=max
 
 :L801F   bpl   :L8013     ;3
 
@@ -661,6 +667,8 @@ READ_JOYSTICK
 
 JOY_X_LCL    dfb   $00
 JOY_Y_LCL    dfb   $00
+
+         put   JOYTBL.S
 
 UPDATE_FRAME
          jsr   READ_JOYSTICK 
@@ -1468,9 +1476,12 @@ NEXT_LEVEL
 
 DRAW_BOARD
          jsr   DRAW_BACKGROUND ;6
-         lda   #$20       ;2
+         lda   #32       ;2
          sta   CROSS_X    ;3
          sta   CROSS_Y    ;3
+         lda   #0
+         sta   CROSS_X_FR
+         sta   CROSS_Y_FR
          jsr   MOVE_GREMLINS ;6
          jsr   DRAW_CROSS ;6
          rts              ;6
