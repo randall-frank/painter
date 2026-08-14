@@ -11,29 +11,30 @@ def make_source(filename: str) -> None:
     center = 55
     deadzone = 8
     
+    # drop out the "deadzone" and scale the rest to [-1,1]
     tbl = []
     for i in range(128):
         if i < center - deadzone:
-            v = (center - i) / center
+            v = -((center - i) / center)
         elif i > center + deadzone:
             v = (i - center) / center
         else:
             v = 0
         tbl.append(v)
 
-    print(tbl)
-    
+    # Convert floats to signed 16 bit values
     highs = []
     lows = []
     for v in tbl:
-        if v >= 1.0:
-            h = 1
-            l = 0
+        # clamp to [-1,1]
+        v = max(-1.0, min(v, 1.0))
+        if v > 0:
+            i = int(v*256)    # 256 is 1.0
         else:
-            h = 0
-            l = int(v * 256)
-        highs.append(h)
-        lows.append(l)
+            i = int((-v)*256) # 256 is -1
+            i = 65536 - i     # twos complement
+        highs.append((i >> 8) & 0xff)
+        lows.append(i & 0xff)
 
     s += "\nJOYSTICK_MAP_TABLE_HI\n"
     for v in highs:        

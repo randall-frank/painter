@@ -147,7 +147,6 @@ which provides a simpler download option and forum to discuss more gameplay rela
 Things To Do
 ~~~~~~~~~~~~
  * Add additional songs
- * Better joystick control, better than diagonals
  * Speed improvements/balance (not sure I like the speedup w/gremlin deaths)
 
 License

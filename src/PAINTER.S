@@ -709,50 +709,26 @@ UPDATE_FRAME
          lda   #FLG_NO_GREMLINS ;2
          ora   FRAME_STATE ;4
          sta   FRAME_STATE ;4
+
 MOVE_CROSS
-         lda   JOY_Y_LCL      ;4
-         cmp   #$14       ;2
-         bcs   :L8086     ;2+
-         lda   #$00       ;2
-         sta   JOY_Y_LCL      ;4
-         jmp   :L8097     ;3
-
-:L8086   cmp   #$50       ;2
-         bcs   :L8092     ;2+
-         lda   #$01       ;2
-         sta   JOY_Y_LCL      ;4
-         jmp   :L8097     ;3
-
-:L8092   lda   #$02       ;2
-         sta   JOY_Y_LCL      ;4
-:L8097   lda   JOY_X_LCL      ;4
-         cmp   #$14       ;2
-         bcs   :L80A6     ;2+
-         lda   #$00       ;2
-         sta   JOY_X_LCL      ;4
-         jmp   :movecr     ;3
-
-:L80A6   cmp   #$50       ;2
-         bcs   :L80B2     ;2+
-         lda   #$01       ;2
-         sta   JOY_X_LCL      ;4
-         jmp   :movecr     ;3
-:L80B2   lda   #$02       ;2
-         sta   JOY_X_LCL      ;4
-
-* move cross
-:movecr  
          ldx   JOY_X_LCL
-         lda   DDELTA,X
          clc
-         adc   CROSS_X    
-         sta   CROSS_X    
+         lda   JOYSTICK_MAP_TABLE_LO, x
+         adc   CROSS_X_FR
+         sta   CROSS_X_FR
+         lda   JOYSTICK_MAP_TABLE_HI, x
+         adc   CROSS_X
+         sta   CROSS_X
          ldx   JOY_Y_LCL
-         lda   DDELTA,X
          clc
-         adc   CROSS_Y    
-         sta   CROSS_Y    
-    
+         lda   JOYSTICK_MAP_TABLE_LO, x
+         adc   CROSS_Y_FR
+         sta   CROSS_Y_FR
+         lda   JOYSTICK_MAP_TABLE_HI, x
+         adc   CROSS_Y
+         sta   CROSS_Y
+
+CLAMP_CROSS
 * clamp to playfield
          lda   CROSS_X    ;3
          cmp   #$00       ;2
