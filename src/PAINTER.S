@@ -1297,6 +1297,7 @@ PLAYAGAME
          sta   LEVEL_NUMBER ;4
          sta   BOARD_NUMBER ;4
 NEXT_LIFE
+         jsr   SETUP_SOUND
          lda   LEVEL_NUMBER ;4
          sec              ;2
          sbc   #$01       ;2
@@ -1363,7 +1364,7 @@ PAUSE_LOOP
 
          ldx   SOUND_LENGTH ;4  Number of loops for sound (board parameter)
 SOUND_FETCH
-         ldy   SOUND_TABLE ; Self modifying code
+         ldy   $FFFF ; Self modifying code
 SHORT_DELAY
          dey             
          bne   SHORT_DELAY ; Tonal delay
@@ -1378,16 +1379,16 @@ INLINE_CLK
 
 END_CHECK
          lda   SOUND_FETCH+1 ; end of table check
-         cmp   #<SOUND_TABLE_END
+         cmp   SOUND_TABLE_END+0
          bne   PING_DONE
          lda   SOUND_FETCH+2
-         cmp   #>SOUND_TABLE_END
+         cmp   SOUND_TABLE_END+1
          bne   PING_DONE
 
-         lda   #>SOUND_TABLE ;loop the sound table
-         sta   SOUND_FETCH+2 
-         lda   #<SOUND_TABLE 
+         lda   SOUND_TABLE_START+0 ;loop the sound table
          sta   SOUND_FETCH+1 
+         lda   SOUND_TABLE_START+1 
+         sta   SOUND_FETCH+2
 
 PING_DONE
          nop              ;2
@@ -1729,107 +1730,43 @@ DISP_NO_FILL
          bne   :delay     ;2+
          rts              ;6
 
+         put   SONG0.S
+
+SOUND_ADDRS
+         da    SONG0_START
+         da    SONG0_END
+
+SOUND_TABLE_START   
+         da   $0000
+SOUND_TABLE_END     
+         da   $0000
+
+SETUP_SOUND
+         lda   #0
+         asl
+         asl
+         tay
+         lda   SOUND_ADDRS,y
+         sta   SOUND_TABLE_START
+         iny
+         lda   SOUND_ADDRS,y
+         sta   SOUND_TABLE_START+1
+         iny
+         lda   SOUND_ADDRS,y
+         sta   SOUND_TABLE_END
+         iny
+         lda   SOUND_ADDRS,y
+         sta   SOUND_TABLE_END+1
+* setup sound
+         lda   SOUND_TABLE_START+1
+         sta   SOUND_FETCH+2 
+         lda   SOUND_TABLE_START+0
+         sta   SOUND_FETCH+1 
+         rts
+
 TXT_OUTOFFILL
          asc   "Out of Paint"
 
-SOUND_TABLE
-         hex   6464646464016464
-         hex   6464640164646464
-         hex   64014b4b4b4b4b4b
-         hex   4b3c3c3c3c3c3c3c
-         hex   3c3c3c3c3c3c3c64
-         hex   6464646401646464
-         hex   6464016464646464
-         hex   014b4b4b4b4b4b4b
-         hex   3c3c3c3c3c3c3c3c
-         hex   3c3c3c3c3c3c4b4b
-         hex   4b4b4b014b4b4b4b
-         hex   4b01505050505001
-         hex   5050505050015a5a
-         hex   5a5a5a015a5a5a5a
-         hex   5a01646464646464
-         hex   6464646464640164
-         hex   6464646401646464
-         hex   6464016464646464
-         hex   0150505050505050
-         hex   4141414141414141
-         hex   4141414141416464
-         hex   6464640164646464
-         hex   6401646464646401
-         hex   5050505050505041
-         hex   4141414141412f2f
-         hex   2f2f2f2f2f2a2a2a
-         hex   2a2a2a2a2f2f2f2f
-         hex   2f2f2f3333333333
-         hex   3333373737373737
-         hex   3741414141414141
-         hex   4b4b4b4b4b4b4b4b
-         hex   4b4b4b4b4b4b4b4b
-         hex   6464646464016464
-         hex   6464640164646464
-         hex   64014b4b4b4b4b4b
-         hex   4b3c3c3c3c3c3c3c
-         hex   3c3c3c3c3c3c3c64
-         hex   6464646401646464
-         hex   6464016464646464
-         hex   014b4b4b4b4b4b4b
-         hex   3c3c3c3c3c3c3c3c
-         hex   3c3c3c3c3c3c4b4b
-         hex   4b4b4b014b4b4b4b
-         hex   4b01505050505001
-         hex   5050505050015a5a
-         hex   5a5a5a015a5a5a5a
-         hex   5a01646464646464
-         hex   6464646464640164
-         hex   6464646401646464
-         hex   6464016464646464
-         hex   0150505050505050
-         hex   4141414141414141
-         hex   4141414141416464
-         hex   6464640164646464
-         hex   6401646464646401
-         hex   5050505050505041
-         hex   4141414141412f2f
-         hex   2f2f2f2f2f2a2a2a
-         hex   2a2a2a2a2f2f2f2f
-         hex   2f2f2f3333333333
-         hex   3333373737373737
-         hex   3741414141414141
-         hex   4b4b4b4b4b4b4b4b
-         hex   4b4b4b4b4b4b4b4b
-         hex   6464646464016464
-         hex   6464640164646464
-         hex   64014b4b4b4b4b4b
-         hex   4b3c3c3c3c3c3c3c
-         hex   3c3c3c3c3c3c3c64
-         hex   6464646401646464
-         hex   6464016464646464
-         hex   014b4b4b4b4b4b4b
-         hex   3c3c3c3c3c3c3c3c
-         hex   3c3c3c3c3c3c4b4b
-         hex   4b4b4b014b4b4b4b
-         hex   4b01505050505001
-         hex   5050505050015a5a
-         hex   5a5a5a015a5a5a5a
-         hex   5a01646464646464
-         hex   6464646464640164
-         hex   6464646401646464
-         hex   6464016464646464
-         hex   0150505050505050
-         hex   4141414141414141
-         hex   4141414141416464
-         hex   6464640164646464
-         hex   6401646464646401
-         hex   5050505050505041
-         hex   4141414141412f2f
-         hex   2f2f2f2f2f2a2a2a
-         hex   2a2a2a2a2f2f2f2f
-         hex   2f2f2f3333333333
-         hex   3333373737373737
-         hex   3741414141414141
-         hex   4b4b4b4b4b4b4b4b
-         hex   4b4b4b4b4b4b4b4b
-SOUND_TABLE_END
          DS    \
 GREMLIN_MASKS
          hex   4601002800007c00
