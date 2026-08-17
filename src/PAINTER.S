@@ -763,8 +763,6 @@ DRAW_CROSS
          lda   CROSS_X    ;3
          sta   X_POS      ;4
          jsr   DIVIDE7    ;6
-         lda   CROSS_Y    ;3
-         jsr   GrScanline ;6
          txa              ;2
          asl   A          ;2
          asl   A          ;2
@@ -773,20 +771,20 @@ DRAW_CROSS
          asl   A          ;2
          sta   CROSS_FETCH+1 ;4
          sty   CROSS_INDEX ;4
+         ldy   CROSS_Y
+         sty   GR_PTMP 
          ldx   #$00       ;2
          lda   #$09       ;2
          sta   UTILITY_INDEX ;4
-:loop    ldy   CROSS_INDEX ;4
-         jsr   CROSS_SCANLINE ;6
-         jsr   GrNextScanline ;6
-         dec   UTILITY_INDEX ;6
-         bne   :loop     ;2+
-         rts              ;6
-
-CROSS_SCANLINE
+]loop    ldy   GR_PTMP
+         lda   ScanlineTblHI,Y
+         sta   GR_HIGH
+         lda   ScanlineTblLO,Y
+         sta   GR_LOW
+         ldy   CROSS_INDEX ;4
          lda   #$03       ;2
          sta   LINE_COUNT ;4
-L814E    lda   (GR_LOW),y ;5+
+]nextx   lda   (GR_LOW),y ;5+
          sta   CROSS_IMAGES+$e0,x ;5
 CROSS_FETCH
          ora   CROSS_IMAGES,x ;4+
@@ -794,27 +792,28 @@ CROSS_FETCH
          iny              ;2
          inx              ;2
          dec   LINE_COUNT ;6
-         bne   L814E      ;2+
+         bne   ]nextx     ;2+
+         inc   GR_PTMP
+         dec   UTILITY_INDEX ;6
+         bne   ]loop     ;2+
          rts              ;6
 
 ERASE_CROSS
          lda   CROSS_X    ;3
          sta   X_POS      ;4
          jsr   DIVIDE7    ;6
-         lda   CROSS_Y    ;3
-         jsr   GrScanline ;6
+         sty   CROSS_INDEX ;4
          lda   #$09       ;2
          sta   UTILITY_INDEX ;4
-         sty   CROSS_INDEX ;4
+         ldy   CROSS_Y
+         sty   GR_PTMP 
          ldx   #$00       ;2
-:L8177   ldy   CROSS_INDEX ;4
-         jsr   ERASE_CROSS_SCANLINE ;6
-         jsr   GrNextScanline ;6
-         dec   UTILITY_INDEX ;6
-         bne   :L8177     ;2+
-         rts              ;6
-
-ERASE_CROSS_SCANLINE
+:L8177   ldy   GR_PTMP
+         lda   ScanlineTblHI,Y
+         sta   GR_HIGH
+         lda   ScanlineTblLO,Y
+         sta   GR_LOW
+         ldy   CROSS_INDEX ;4
          lda   #$03       ;2
          sta   LINE_COUNT ;4
 :L818B   lda   CROSS_IMAGES+$e0,x ;4+
@@ -823,6 +822,9 @@ ERASE_CROSS_SCANLINE
          iny              ;2
          dec   LINE_COUNT ;6
          bne   :L818B     ;2+
+         inc   GR_PTMP
+         dec   UTILITY_INDEX ;6
+         bne   :L8177     ;2+
          rts              ;6
 
 UTILITY_INDEX
@@ -1025,9 +1027,7 @@ G_MOVE_DONE
          rts              ;6
 
 DRAW_GREMLIN
-         ldy   UTILITY_INDEX ;4
-         lda   GREMLIN_Y,y ;4+
-         jsr   GrScanline ;6
+         ldy   UTILITY_INDEX ;4         
          lda   GREMLIN_X,y ;4+
          sta   X_POS      ;4
          jsr   DIVIDE7    ;6
@@ -1037,34 +1037,37 @@ DRAW_GREMLIN
          asl   A          ;2
          asl   A          ;2
          asl   A          ;2
-         sta   SCANLINE_LOOP+1 ;4
+         sta   GFETCH+1 ;4
          sty   CROSS_INDEX ;4
+         ldy   UTILITY_INDEX ;4
+         lda   GREMLIN_Y,y ;4+
+         sta   GR_PTMP
          ldx   #$00       ;2
          lda   #$0a       ;2  9 lines
          sta   LINE_COUNT ;4
-:L831B   jsr   SCANLINE   ;6
-         jsr   GrNextScanline ;6
-         dec   LINE_COUNT ;6
-         bne   :L831B     ;2+
-         rts              ;6
+]nexty   ldy   GR_PTMP
+         lda   ScanlineTblHI,Y
+         sta   GR_HIGH
+         lda   ScanlineTblLO,Y
+         sta   GR_LOW
 
-SCANLINE ldy   CROSS_INDEX ;4
+         ldy   CROSS_INDEX ;4
          lda   #$03       ;2
          sta   BYTE_COUNT_SCANLINE ;4
-SCANLINE_LOOP
-         lda   GREMLIN_IMAGES,x ;4+ Modified lower address
+GFETCH   lda   GREMLIN_IMAGES,x ;4+ Modified lower address
          eor   (GR_LOW),y ;5+
          sta   (GR_LOW),y ;6
          inx              ;2
          iny              ;2
          dec   BYTE_COUNT_SCANLINE ;6
-         bne   SCANLINE_LOOP ;2+
+         bne   GFETCH ;2+
+
+         inc   GR_PTMP
+         dec   LINE_COUNT ;6
+         bne   ]nexty    ;2+
          rts              ;6
 
 GREMLIN_MASK_CHECK
-         ldy   UTILITY_INDEX ;4
-         lda   GREMLIN_Y,y ;4+
-         jsr   GrScanline ;6
          lda   GREMLIN_X,y ;4+
          sta   X_POS      ;4
          jsr   DIVIDE7    ;6
@@ -1076,19 +1079,23 @@ GREMLIN_MASK_CHECK
          asl   A          ;2
          sta   NEXT_MASK_BYTE+1 ;4
          sty   CROSS_INDEX ;4
+
+         ldy   UTILITY_INDEX ;4
+         lda   GREMLIN_Y,y ;4+
+         sta   GR_PTMP
+
          lda   #$80       ;2
          sta   MASK_CHECK_FLAG ;4
          ldx   #$00       ;2
          lda   #$0a       ;2
          sta   LINE_COUNT ;4
-MASK_LOOP
-         jsr   MASK_SCANLINE ;6
-         jsr   GrNextScanline ;6
-         dec   LINE_COUNT ;6
-         bne   MASK_LOOP  ;2+
-         rts              ;6
 
-MASK_SCANLINE
+]nexty   ldy   GR_PTMP
+         lda   ScanlineTblHI,Y
+         sta   GR_HIGH
+         lda   ScanlineTblLO,Y
+         sta   GR_LOW
+
          ldy   CROSS_INDEX ;4
          lda   #$03       ;2
          sta   BYTE_COUNT_SCANLINE ;4
@@ -1109,6 +1116,10 @@ NEXT_MASK_BYTE
          iny              ;2
          dec   BYTE_COUNT_SCANLINE ;6
          bne   NEXT_MASK_BYTE ;2+
+
+         inc   GR_PTMP
+         dec   LINE_COUNT ;6
+         bne   ]nexty  ;2+
          rts              ;6
 
 MASK_CHECK_FLAG

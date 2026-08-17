@@ -106,7 +106,9 @@ Gameplay looks like this:
 .. raw:: html
 
    <p align="center">
-     <img src="gameplay.png" style="width:600px; height:auto;">
+      <video autoplay muted loop controls width="559" height="383">
+         <source src="output.mp4" type="video/mp4">
+      </video>
    </p>
 
 
