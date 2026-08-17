@@ -106,7 +106,7 @@ Gameplay looks like this:
 .. raw:: html
 
    <p align="center">
-     <img src="gameplay.png" style="width:600px; height:auto;">
+      <video src="https://github.com/user-attachments/assets/5cd99cc5-7ec7-430c-bd64-778351076ad9" width="100%" autoplay muted loop controls playsinline ></video>
    </p>
 
 
@@ -152,3 +152,4 @@ Things To Do
 License
 -------
 `Painter` is licensed under the MIT license.
+
